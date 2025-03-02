@@ -9,5 +9,11 @@ data class Note(
     val title: String,
     val content: String,
     val timestamp: Long = System.currentTimeMillis(),
-    val color: Int
+    val color: Int,
+    val alarmTime:Long?=null,
+    val type:NoteType=NoteType.CODE
 )
+
+enum class NoteType{
+    CODE,TASK_MANAGEMENT,MIND_MAP
+}

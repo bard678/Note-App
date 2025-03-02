@@ -7,10 +7,18 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Note
 import com.example.myapplication.data.NoteDao
 import com.example.myapplication.data.NoteDatabase
+import com.example.myapplication.data.NoteType
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class NoteViewModel(private  val noteDao: NoteDao):ViewModel() {
  val allNote=noteDao.getAllNotes()
+
+    //TODO Get Notes By Type
+    fun getNotesByType(type:NoteType):Flow<List<Note>>{
+
+        return noteDao.getNotesByType(type)
+    }
  var selectedNote: Note? = null
     fun addNote(title: String, content: String, color: Int){
       viewModelScope.launch {

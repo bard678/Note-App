@@ -1,184 +1,188 @@
 package com.example.myapplication.navigation.screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.List
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.R
 import com.example.myapplication.data.Note
-import com.example.myapplication.navigation.AppBar
+import com.example.myapplication.ui.components.AppBar
 import com.example.myapplication.viewmodel.NoteViewModel
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(viewModel: NoteViewModel,navController: NavController) {
-    val allNote: List<Note> by viewModel.allNote.collectAsState(initial = emptyList())
+fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
+    val allNote by viewModel.allNote.collectAsState(initial = emptyList())
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF6A11CB), Color(0xFF2575FC))
-                )
-            )
+            .background(Brush.verticalGradient(colors = listOf(Color(0xFF1E3C72), Color(0xFF2A5298))))
     ) {
+        //TODO App Bar
         AppBar(navController)
+
+        //TODO Top Body Bar
         TopBodyBar()
 
-        // Content list of notes
-        LazyColumn(modifier = Modifier.padding(16.dp)) {
-            items(allNote) { note ->
-                NoteItem(
-                    modifier = Modifier.animateItemPlacement(),
-                    note = note,
-                    onDelete = { viewModel.deleteNote(note) },
-                    onClick = {
-                        viewModel.selectedNote=note
-                       navController.navigate("read")
-
-                    }
-                )
+        //TODO Display list of notes
+        if (allNote.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                items(allNote, key = { it.id }) { note ->
+                    NoteItem(
+                        note = note,
+                        onDelete = { viewModel.deleteNote(note) },
+                        onClick = {
+                            //TODO Go to Read Screen
+                            viewModel.selectedNote = note
+                            navController.navigate("read")
+                        },
+                        modifier = Modifier.animateItemPlacement()
+                    )
+                }
             }
+        } else {
+            // No Notes UI
+            EmptyStateUI(navController)
         }
     }
 }
 
+//TODO Note item (Card)
 @Composable
-fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit,  modifier :Modifier) {
-    // Card container to hold the note
+fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit, modifier: Modifier) {
     Card(
-
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.2f)
-        ),
-        modifier = Modifier
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f)),
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .height(180.dp)
+            .height(160.dp)
             .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-        ,
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        // Column to vertically align title, content, and delete button
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(), // Make the row fill the width of the screen
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween // This ensures spacing between content and delete button
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier
-                    .weight(1f) // This makes sure the column takes up the remaining space
+                modifier = Modifier.weight(1f)
             ) {
-                // Note title
                 Text(
-                    text = note.title, // Replace with note.title when you have data
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = note.title,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White, // Text color is white for contrast
+                    color = Color.White,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis // Truncate long titles
+                    overflow = TextOverflow.Ellipsis
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
-
-                // Note content
                 Text(
-                    modifier = Modifier
-                        .width(200.dp) // Limit the width of the content
-                        .padding(5.dp),
-                    text =note.content,
+                    text = note.content,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.8f), // Lighter text color
+                    color = Color.White.copy(alpha = 0.8f),
                     maxLines = 4,
-                    fontWeight = FontWeight.W500,
-                    overflow = TextOverflow.Ellipsis // Truncate long content
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
-            // Delete button
             IconButton(
                 onClick = onDelete,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(36.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete Note",
-                    tint = Color.White
+                    tint = Color(0xFFFF6B6B)
                 )
             }
         }
     }
 }
 
-//TIP <b>Run</b>
+// Empty State UI
+@Composable
+fun EmptyStateUI(navController: NavController) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.event_note),
+                contentDescription = "No notes",
+                modifier = Modifier.size(80.dp),
+                tint = Color.LightGray
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "No notes found",
+                fontSize = 18.sp,
+                color = Color.Gray
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = { navController.navigate("add") },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+            ) {
+                Text(text = "Add a Note", color = Color.White)
+            }
+        }
+    }
+}
 
-//region Top Body Bar
+//TODO Top Body Bar
 @Composable
 private fun TopBodyBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(0.dp,5.dp)
-            .background(Color.White.copy(alpha = 0.8f),)
+            .background(Color.White.copy(alpha = 0.9f))
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "All Notes",
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2575FC)
+            color = Color(0xFF1E3C72)
         )
         IconButton(onClick = {}) {
             Icon(
                 imageVector = Icons.Outlined.List,
                 contentDescription = "List View",
-                modifier = Modifier.size(30.dp),
-                tint = Color(0xFF2575FC)
+                modifier = Modifier.size(25.dp),
+                tint = Color(0xFF1E3C72)
             )
         }
     }
 }
-//endregion

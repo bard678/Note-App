@@ -1,7 +1,5 @@
-package com.example.myapplication.ui
+package com.example.myapplication.navigation.screen
 
-import android.app.Application
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

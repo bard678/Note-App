@@ -43,11 +43,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.TEST.FakeNoteReadScreen
 import com.example.myapplication.data.Note
 import com.example.myapplication.data.NoteDatabase
 import com.example.myapplication.navigation.AppNavHost
-import com.example.myapplication.ui.NoteAddScreen
 import com.example.myapplication.viewmodel.NoteViewModel
 import com.example.myapplication.viewmodel.ViewModelFactory
 

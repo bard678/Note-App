@@ -11,7 +11,7 @@ data class Note(
     val timestamp: Long = System.currentTimeMillis(),
     val color: Int,
     val alarmTime:Long?=null,
-    val type:NoteType=NoteType.CODE
+    val type:NoteType?=NoteType.CODE
 )
 
 enum class NoteType{

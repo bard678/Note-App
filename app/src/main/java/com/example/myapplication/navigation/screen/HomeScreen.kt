@@ -4,10 +4,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -22,25 +22,86 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.data.Note
+import com.example.myapplication.data.NoteType
 import com.example.myapplication.ui.components.AppBar
+import com.example.myapplication.ui.components.dialogs.ConfirmAlertDialog
+import com.example.myapplication.ui.components.dialogs.OptionsDialog
 import com.example.myapplication.viewmodel.NoteViewModel
 
+
+//region home ui
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
-    val allNote by viewModel.allNote.collectAsState(initial = emptyList())
+   val notes by viewModel.allNote.collectAsState(initial = emptyList())
+    var allNote by remember { mutableStateOf<List<Note>>(emptyList()) }
+    var showOptionDialog = remember { mutableStateOf(false) }
+    var selectedFilter by remember { mutableStateOf<NoteType?>(null) }
+    var showDeleteDialog= remember { mutableStateOf(false) }
+    var deletedNote= remember { mutableStateOf<Note?>(null) }
+    // Update allNote when selectedFilter changes
+    LaunchedEffect(notes, selectedFilter) {
+        allNote = when (selectedFilter) {
+            null -> notes
+            else -> notes.filter { it.type == selectedFilter }
+        }
+    }
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(colors = listOf(Color(0xFF1E3C72), Color(0xFF2A5298))))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1E3C72),
+                        Color(0xFF2A5298)
+                    )
+                )
+            )
     ) {
         //TODO App Bar
-        AppBar(navController)
+        AppBar( showOptionDialog = showOptionDialog)
 
         //TODO Top Body Bar
-        TopBodyBar()
+        TopBodyBar(
+            selectedFilter = selectedFilter,
+            onFilterSelected = {
+                noteType -> println(noteType?.name)
+                selectedFilter = noteType
 
+                println(selectedFilter?.name)
+                println(allNote.size)
+            }
+        )
+   //TODO show option dialog before add note
+        if(showOptionDialog.value){
+            OptionsDialog(
+                onDismiss = {showOptionDialog.value=false},
+                onOptionSelected = {
+                    noteType ->
+                     //TODO Set the selected note type in viewModel class
+                    viewModel.selectedNoteType=noteType
+                    println("${ viewModel?.selectedNoteType?.name }")
+                    showOptionDialog.value=false
+                    navController.navigate("add")
+                },
+
+            )
+        }
+        if(showDeleteDialog.value){
+            ConfirmAlertDialog(
+                onDismiss = {showDeleteDialog.value=false },
+                onConfirm = {
+                   if(deletedNote.value!=null){
+                       viewModel.deleteNote(deletedNote.value)
+                   }
+                    showDeleteDialog.value=false
+                            },
+                msg = "Do you want to delete it.",
+                title = "Confirm delete"
+            )
+        }
         //TODO Display list of notes
         if (allNote.isNotEmpty()) {
             LazyColumn(
@@ -51,7 +112,10 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
                 items(allNote, key = { it.id }) { note ->
                     NoteItem(
                         note = note,
-                        onDelete = { viewModel.deleteNote(note) },
+                        onDelete = {
+                            showDeleteDialog.value=true
+                            deletedNote.value=note
+                                   },
                         onClick = {
                             //TODO Go to Read Screen
                             viewModel.selectedNote = note
@@ -88,9 +152,36 @@ fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit, modifier: Mo
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Type Indicator (Left Side)
+            Box(
+                modifier = Modifier
+                    .size(35.dp)
+                    .clip(CircleShape)
+                    .background(getNoteTypeColor(note.type)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    modifier =Modifier.size(30.dp),
+                    painter = painterResource(getNoteTypeIcon(note.type)),
+                    contentDescription = note.type?.name ?: "Note Type",
+                    tint = Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp)) // Spacing between icon and text
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                // Type Label Above Title
+                Text(
+                    text = note.type?.name ?: "Unknown",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = getNoteTypeColor(note.type),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
                 Text(
                     text = note.title,
                     style = MaterialTheme.typography.titleMedium,
@@ -120,6 +211,28 @@ fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit, modifier: Mo
                 )
             }
         }
+    }
+}
+
+// Function to get color based on note type
+@Composable
+fun getNoteTypeColor(type: NoteType?): Color {
+    return when (type) {
+        NoteType.CODE -> Color(0xFF4CAF50) // Green for Code
+        NoteType.MIND_MAP -> Color(0xFF03A9F4) // Blue for Mind Map
+        NoteType.TASK_MANAGEMENT -> Color(0xFFFFC107) // Yellow for Tasks
+        else -> Color.Gray
+    }
+}
+
+// Function to get icon based on note type
+@Composable
+fun getNoteTypeIcon(type: NoteType?): Int {
+    return when (type) {
+        NoteType.CODE -> R.drawable.code // Code icon
+        NoteType.MIND_MAP -> R.drawable.map// Mind Map icon
+        NoteType.TASK_MANAGEMENT ->R.drawable.check_circle_outline// Task icon
+        else -> R.drawable.description
     }
 }
 
@@ -160,29 +273,69 @@ fun EmptyStateUI(navController: NavController) {
 }
 
 //TODO Top Body Bar
+
 @Composable
-private fun TopBodyBar() {
+fun TopBodyBar(
+    selectedFilter: NoteType?,
+    onFilterSelected: (NoteType?) -> Unit
+) {
+    var scrollState = rememberScrollState()
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White.copy(alpha = 0.9f))
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(16.dp).
+            horizontalScroll(scrollState),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "All Notes",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E3C72)
+        // All Notes Button
+        FilterButton(
+            label = "All",
+            isSelected = selectedFilter == null,
+            color = Color.Gray,
+            onClick = { onFilterSelected(null) }
         )
-        IconButton(onClick = {}) {
-            Icon(
-                imageVector = Icons.Outlined.List,
-                contentDescription = "List View",
-                modifier = Modifier.size(25.dp),
-                tint = Color(0xFF1E3C72)
-            )
-        }
+
+        // Code Notes Button
+        FilterButton(
+            label = "Code",
+            isSelected = selectedFilter == NoteType.CODE,
+            color = Color(0xFF4CAF50),
+            onClick = { onFilterSelected(NoteType.CODE) }
+        )
+
+        // Task Management Button
+        FilterButton(
+            label = "Tasks",
+            isSelected = selectedFilter == NoteType.TASK_MANAGEMENT,
+            color = Color(0xFFFFC107),
+            onClick = { onFilterSelected(NoteType.TASK_MANAGEMENT) }
+        )
+
+        // Mind Map Button
+        FilterButton(
+            label = "Mind Map",
+            isSelected = selectedFilter == NoteType.MIND_MAP,
+            color = Color(0xFF03A9F4),
+            onClick = { onFilterSelected(NoteType.MIND_MAP) }
+        )
     }
 }
+
+// Reusable Filter Button
+@Composable
+fun FilterButton(label: String, isSelected: Boolean, color: Color, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) color else color.copy(alpha = 0.5f),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.padding(4.dp)
+    ) {
+        Text(text = label, fontWeight = FontWeight.Bold)
+    }
+}
+
+//endregion

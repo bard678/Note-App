@@ -1,5 +1,6 @@
 package com.example.myapplication.navigation.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,8 +49,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.data.NoteDatabase
+import com.example.myapplication.data.NoteType
 import com.example.myapplication.data.models.ColorObject
 import com.example.myapplication.ui.components.ColorDropdownScreen
+import com.example.myapplication.ui.components.dialogs.ConfirmAlertDialog
 import com.example.myapplication.viewmodel.NoteViewModel
 import com.example.myapplication.viewmodel.ViewModelFactory
 import java.text.SimpleDateFormat
@@ -81,6 +84,9 @@ fun NoteAddScreen(viewModel: NoteViewModel,navController: NavController) {
     val selectedColor= remember { mutableStateOf( ColorObject(Color(0xFF002F50), "Deep Navy")) }
     val scrollState= rememberScrollState()
     val clipBoardManager=    LocalClipboardManager.current
+    val selectedNoteType=viewModel.selectedNoteType
+    var showSaveDialog= remember { mutableStateOf(false) }
+
    Box(
        modifier = Modifier
            .fillMaxSize()
@@ -113,7 +119,9 @@ fun NoteAddScreen(viewModel: NoteViewModel,navController: NavController) {
                 // 🔙 Back Button
                 IconButton(
                     onClick = {
-                        navController.navigate("home")
+
+                      //  navController.navigate("home")
+                        showSaveDialog.value=true
                     },
                     modifier = Modifier
                         .size(40.dp)
@@ -129,12 +137,18 @@ fun NoteAddScreen(viewModel: NoteViewModel,navController: NavController) {
                 // 🔙 Save Button
                 IconButton(
                     onClick = {
-                        viewModel.addNote(
-                            title = noteTitle.value,
-                            content = noteDescription.value,
-                            color = selectedColor.value.color.toArgb(),
-
+                        //TODO Add note to the table
+                        if (selectedNoteType != null) {
+                            viewModel.addNote(
+                                title = noteTitle.value,
+                                content = noteDescription.value,
+                                color = selectedColor.value.color.toArgb(),
+                                type = selectedNoteType
                             )
+                        }
+                        if (selectedNoteType != null) {
+                            println("MSG ${selectedNoteType?.name}")
+                        }
                         navController.navigate("home")
                     },
                     modifier = Modifier
@@ -148,7 +162,32 @@ fun NoteAddScreen(viewModel: NoteViewModel,navController: NavController) {
                     )
                 }
             }
+            val context= LocalContext.current
+            if(showSaveDialog.value){
+                ConfirmAlertDialog(
+                    onConfirm = {
+                        if (selectedNoteType != null) {
+                            viewModel.addNote(
+                                title = noteTitle.value,
+                                content = noteDescription.value,
+                                color = selectedColor.value.color.toArgb(),
+                                type = selectedNoteType
+                            )
+                        }
 
+                        showSaveDialog.value=false
+                        navController.navigate("home")
+                        Toast.makeText(context,"Saved successfully",Toast.LENGTH_SHORT).show()
+                    },
+                    onDismiss = {
+                        showSaveDialog.value=false
+                        navController.navigate("home")
+
+                    },
+                    msg = "Do you want to save it.",
+                    title = "Confirm save"
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             // 📌 Note Title input

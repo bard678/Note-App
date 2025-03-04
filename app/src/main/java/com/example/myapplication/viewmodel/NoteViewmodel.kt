@@ -1,6 +1,5 @@
 package com.example.myapplication.viewmodel
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -18,24 +17,29 @@ class NoteViewModel(private  val noteDao: NoteDao):ViewModel() {
     fun getNotesByType(type:NoteType):Flow<List<Note>>{
 
         return noteDao.getNotesByType(type)
-    }
+     }
  var selectedNote: Note? = null
-    fun addNote(title: String, content: String, color: Int){
+ var selectedNoteType: NoteType? = null
+    fun addNote(title: String, content: String,color: Int,type: NoteType=NoteType.TASK_MANAGEMENT){
+     println("Note Type is : ${type.name}")
       viewModelScope.launch {
           noteDao.insertNote(
               Note(
                   title = title,
                   content = content,
-                  color = color
+                  color = color,
+                  type = type
               )
           )
 
       }
 
     }
-    fun deleteNote(note: Note) {
+    fun deleteNote(note: Note?) {
         viewModelScope.launch {
-            noteDao.deleteNote(note)
+            if (note != null) {
+                noteDao.deleteNote(note)
+            }
         }
     }
 }

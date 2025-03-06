@@ -36,59 +36,59 @@ import java.util.Locale
 fun ReadCodeScreen(viewModel: NoteViewModel,navController: NavController){
 
     val selectedNote=viewModel.selectedNote
-  Column(
-      modifier = Modifier
-          .background(Color.Blue.copy(alpha = 0.9f))
-          .fillMaxSize()
-          .padding(top = 20.dp)
-  )  {
-      Row(
-          horizontalArrangement = Arrangement.SpaceBetween,
-          modifier = Modifier.fillMaxWidth()
-      ){
-          IconButton(
-              onClick = {
-                  navController.popBackStack()
-              },
-              modifier = Modifier
-                  .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
-                  .size(50.dp)
-                  .background(Color.White.copy(alpha = 0.2f), CircleShape)
-          ) {
-              Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-          }
-          IconButton(
-              onClick = { },
-              modifier = Modifier
-                  .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
-                  .size(50.dp)
-                  .background(Color.White.copy(alpha = 0.2f), CircleShape)
-          ) {
-              Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White)
-          }
-      }
+    if (selectedNote != null) {
+        Column(
+            modifier = Modifier
+                .background(Color(selectedNote.color))
+                .fillMaxSize()
+                .padding(top = 20.dp)
+        )  {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
+                        .size(50.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                ) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
+                        .size(50.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                ) {
+                    Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White)
+                }
+            }
 
 
-                Column {
-                    if (selectedNote != null) {
-                        Text(
-                            text = selectedNote.title.uppercase(Locale.ROOT),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
+            Column {
+                if (selectedNote != null) {
+                    Text(
+                        text = selectedNote.title.uppercase(Locale.ROOT),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
 
-                            color = Color.White,
+                        color = Color.White,
 
-                            modifier = Modifier.padding(start = 10.dp)
-                        )
-                    }
-                    val codeBlocks= selectedNote?.codeBlocks
-                    if(codeBlocks!=null)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+                }
+                val codeBlocks= selectedNote?.codeBlocks
+                if(codeBlocks!=null)
                     LazyColumn (
                         modifier = Modifier.padding(10.dp)
                     ) {
                         items(codeBlocks)
-                        {
-                            codeBlock->
+                        { codeBlock->
                             CodeBlockWidget(
                                 description = mutableStateOf(codeBlock.description),
                                 language = mutableStateOf(codeBlock.language),
@@ -97,8 +97,9 @@ fun ReadCodeScreen(viewModel: NoteViewModel,navController: NavController){
                             )
                         }
                     }
-                }
+            }
 
 
+        }
     }
 }

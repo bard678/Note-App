@@ -151,7 +151,10 @@ fun NoteEditScreen(navController: NavController, viewModel: NoteViewModel) {
      }
  }
 //endregion
-    }}
+    }
+}
+
+
 @Composable
 fun ColorPicker(selectedColor: Int, onColorSelected: (Int) -> Unit) {
     val colors = listOf(0xFFA726, 0x66BB6A, 0x29B6F6, 0xAB47BC, 0xFF7043)

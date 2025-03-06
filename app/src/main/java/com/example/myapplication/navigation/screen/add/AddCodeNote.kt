@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
@@ -51,137 +52,148 @@ fun AddCodeNoteScreen(
     var title= remember { mutableStateOf("title") }
     var showSaveDialog= remember { mutableStateOf(false) }
 
-    Column (
-        modifier = Modifier
-            .background(selectedColor.value.color)
-            .fillMaxSize()
-            .padding(top = 20.dp)
-    ){
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(top = 30.dp).background(Color.Black.copy(0.1f))
-        ){
-            IconButton(
-                onClick = {
-                    showSaveDialog.value=true
-
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
-                    .size(50.dp)
-                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
+    Box(){
+        Column(
+            modifier = Modifier
+                .background(selectedColor.value.color)
+                .fillMaxSize()
+                .padding(top = 20.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().padding(top = 30.dp)
+                    .background(Color.Black.copy(0.1f))
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-            }
-            IconButton(
-                onClick = {
-                    navController.popBackStack()
-                    //TODO insert code note
+                IconButton(
+                    onClick = {
+                        showSaveDialog.value = true
 
-                    viewModel.addCodeNote(
-                        title = title.value,
-                        content = "",
-                        color = selectedColor.value.color.toArgb(),
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
+                        .size(50.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                ) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                IconButton(
+                    onClick = {
+                        navController.popBackStack()
+                        //TODO insert code note
 
-                        codeBlocks = codeList
-                    )
-                    showSaveDialog.value=false
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
-                    .size(50.dp)
-                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
-            ) {
-                Icon(Icons.Default.Check, contentDescription = "ADD", tint = Color.White)
-            }
-        }
-        TextField(
+                        viewModel.addCodeNote(
+                            title = title.value,
+                            content = "",
+                            color = selectedColor.value.color.toArgb(),
 
-            modifier = Modifier.padding(start = 0.dp),
-
-            value = title.value,
-            onValueChange = {
-                title.value=it
-            }
-        )
-
-        if(showSaveDialog.value){
-            var context= LocalContext.current
-            ConfirmAlertDialog(
-                onConfirm = {
-
-
-                    //TODO insert code note
-
-                    viewModel.addCodeNote(
-                        title = title.value,
-                        content = "",
-                        color = selectedColor.value.color.toArgb(),
-
-                        codeBlocks = codeList
-                    )
-                    navController.popBackStack()
-
-                    showSaveDialog.value=false
-                    Toast.makeText(context,"Saved successfully",Toast.LENGTH_SHORT).show()
-                },
-                onDismiss = {
-                    showSaveDialog.value=false
-                    navController.navigate("home")
-
-                },
-                msg = "Do you want to save it.",
-                title = "Confirm save"
-            )
-        }
-        Column (){
-            LazyColumn {
-                itemsIndexed(codeList)
-                {
-                        i, codeBlok->
-
-                    var description = remember { mutableStateOf("Description") }
-                    var language = remember { mutableStateOf("Java") }
-                    var code = remember { mutableStateOf("Java()") }
-                    codeList.set(index = i, element =  CodeBlock(
-                        description = description.value,
-                        code = code.value,
-                        language = language.value
-                    )
-                    )
-                    CodeBlockWidget(
-                        editable = true,
-                        description = description,
-                        language = language,
-
-                        code = code,
-                    )
-
-
+                            codeBlocks = codeList
+                        )
+                        showSaveDialog.value = false
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
+                        .size(50.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = "ADD", tint = Color.White)
                 }
             }
-            Button(
-                onClick = {
-                    println(codeList)
-                    codeList.add(
+            TextField(
 
-                        CodeBlock(
-                            description = "TODO()",
-                            code = "TODO()",
-                            language = "TODO()"
+                modifier = Modifier.padding(start = 0.dp),
+
+                value = title.value,
+                onValueChange = {
+                    title.value = it
+                }
+            )
+
+            if (showSaveDialog.value) {
+                var context = LocalContext.current
+                ConfirmAlertDialog(
+                    onConfirm = {
+
+
+                        //TODO insert code note
+
+                        viewModel.addCodeNote(
+                            title = title.value,
+                            content = "",
+                            color = selectedColor.value.color.toArgb(),
+
+                            codeBlocks = codeList
                         )
-                    )
-                },
-                shape = RectangleShape,
-                modifier = Modifier.padding(5.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ColorServices().darkBlue
-                )
-            ) {
-                Text(
-                    text = "Add Code Block"
+                        navController.popBackStack()
+
+                        showSaveDialog.value = false
+                        Toast.makeText(context, "Saved successfully", Toast.LENGTH_SHORT).show()
+                    },
+                    onDismiss = {
+                        showSaveDialog.value = false
+                        navController.navigate("home")
+
+                    },
+                    msg = "Do you want to save it.",
+                    title = "Confirm save"
                 )
             }
+
+                LazyColumn(
+
+                    modifier = Modifier.padding(bottom = 150.dp)
+
+                ) {
+                    itemsIndexed(codeList)
+                    { i, codeBlok ->
+
+                        var description = remember { mutableStateOf("Description") }
+                        var language = remember { mutableStateOf("Java") }
+                        var code = remember { mutableStateOf("Java()") }
+                        codeList.set(
+                            index = i, element = CodeBlock(
+                                description = description.value,
+                                code = code.value,
+                                language = language.value
+                            )
+                        )
+                        CodeBlockWidget(
+                            editable = true,
+                            description = description,
+                            language = language,
+
+                            code = code,
+                        )
+
+
+                    }
+                }
+
+
+
+        }
+        FloatingActionButton(
+            containerColor = ColorServices().darkBlue,
+            onClick = {
+                println(codeList)
+                codeList.add(
+
+                    CodeBlock(
+                        description = "TODO()",
+                        code = "TODO()",
+                        language = "TODO()"
+                    )
+                )
+            },
+            modifier = Modifier
+
+                .align(Alignment.BottomEnd)
+                .padding(16.dp).padding(bottom = 50.dp)
+
+        ) {
+            Icon(
+                tint = Color.White,
+
+            imageVector =     Icons.Default.Add, contentDescription = "Add Code Block")
         }
     }
 }

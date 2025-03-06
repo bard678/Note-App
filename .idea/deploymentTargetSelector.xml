@@ -4,16 +4,28 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-03-04T20:46:43.026128700Z">
+        <DropdownSelection timestamp="2025-03-06T17:33:59.094317400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\ecc\.android\avd\Pixel_8_API_27.avd" />
+              <DeviceId pluginId="FirebaseDirectAccess" identifier="reservation=projects/fir-478f7/deviceSessions/session-11kzxgklz267y" />
             </handle>
+            <template>
+              <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=shiba/34" />
+            </template>
           </Target>
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="TestHomeScreen">
+      <SelectionState runConfigName="AddCodeNoteScreen">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="CodeEditorPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="ReadCodeScreen">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="TestAddCodeNote">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

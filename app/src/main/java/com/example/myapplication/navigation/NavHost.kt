@@ -1,21 +1,18 @@
 package com.example.myapplication.navigation
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.navigation.screen.add.AddCodeNoteScreen
 import com.example.myapplication.navigation.screen.HomeScreen
 import com.example.myapplication.navigation.screen.NoteReadScreen
 import com.example.myapplication.navigation.screen.NoteAddScreen
+import com.example.myapplication.navigation.screen.NoteEditScreen
+import com.example.myapplication.navigation.screen.add.MindMapNoteScreen
+import com.example.myapplication.navigation.screen.add.TaskManagementScreen
+import com.example.myapplication.navigation.screen.edit.EditCodeNote
+import com.example.myapplication.navigation.screen.view.ReadCodeScreen
 import com.example.myapplication.viewmodel.NoteViewModel
 
 @Composable
@@ -27,5 +24,26 @@ fun AppNavHost(viewModel: NoteViewModel) {
         composable("home") { HomeScreen( viewModel = viewModel,navController = navController) }
         composable("add") { NoteAddScreen(viewModel = viewModel, navController = navController) }
         composable("read") { NoteReadScreen(viewModel = viewModel, navController = navController) }
+        composable("edit") { NoteEditScreen(viewModel = viewModel, navController = navController) }
+        composable("addCode") { AddCodeNoteScreen(
+            viewModel = viewModel, navController = navController,
+            onSave = {}
+        ) }
+        composable("addTask") { TaskManagementScreen(
+            viewModel = viewModel, navController = navController,
+           onSaveNote = {}
+        ) }
+        composable("readCodeNote") { ReadCodeScreen(
+            viewModel = viewModel, navController = navController,
+
+        ) }
+        composable("addMindMap") { MindMapNoteScreen (
+            viewModel = viewModel, navController = navController,
+           onSave = {}
+        ) }
+        composable("editCodeNote") { EditCodeNote (
+            viewModel = viewModel, navController = navController,
+
+        ) }
     }
 }

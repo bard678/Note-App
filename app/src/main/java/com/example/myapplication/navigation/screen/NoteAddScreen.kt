@@ -163,7 +163,7 @@ fun NoteAddScreen(viewModel: NoteViewModel,navController: NavController) {
                 }
             }
             val context= LocalContext.current
-            if(showSaveDialog.value){
+            if (showSaveDialog.value) {
                 ConfirmAlertDialog(
                     onConfirm = {
                         if (selectedNoteType != null) {
@@ -175,12 +175,12 @@ fun NoteAddScreen(viewModel: NoteViewModel,navController: NavController) {
                             )
                         }
 
-                        showSaveDialog.value=false
+                        showSaveDialog.value = false
                         navController.navigate("home")
-                        Toast.makeText(context,"Saved successfully",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Saved successfully", Toast.LENGTH_SHORT).show()
                     },
                     onDismiss = {
-                        showSaveDialog.value=false
+                        showSaveDialog.value = false
                         navController.navigate("home")
 
                     },

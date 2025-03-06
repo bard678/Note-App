@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -79,12 +80,19 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
             OptionsDialog(
                 onDismiss = {showOptionDialog.value=false},
                 onOptionSelected = {
+                    //TODO Manage navigation for Add screens
                     noteType ->
                      //TODO Set the selected note type in viewModel class
                     viewModel.selectedNoteType=noteType
                     println("${ viewModel?.selectedNoteType?.name }")
                     showOptionDialog.value=false
-                    navController.navigate("add")
+                    when(viewModel.selectedNoteType){
+                        NoteType.CODE->  navController.navigate("addCode")
+                        NoteType.TASK_MANAGEMENT -> navController.navigate("addTask")
+                        NoteType.MIND_MAP ->  navController.navigate("addMindMap")
+                        null -> {}
+                    }
+
                 },
 
             )
@@ -112,6 +120,17 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
                 items(allNote, key = { it.id }) { note ->
                     NoteItem(
                         note = note,
+                        onEdit = {
+                            //TODO Go to Edit Screen
+                            viewModel.selectedNote = note
+
+                            when(note.type){
+                                NoteType.CODE -> navController.navigate("editCodeNote")
+                                NoteType.TASK_MANAGEMENT -> navController.navigate("editCodeNote")
+                                NoteType.MIND_MAP -> navController.navigate("editCodeNote")
+                                null -> {}
+                            }
+                        },
                         onDelete = {
                             showDeleteDialog.value=true
                             deletedNote.value=note
@@ -119,7 +138,12 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
                         onClick = {
                             //TODO Go to Read Screen
                             viewModel.selectedNote = note
-                            navController.navigate("read")
+                            when(note.type){
+                                NoteType.CODE -> navController.navigate("readCodeNote")
+                                NoteType.TASK_MANAGEMENT -> navController.navigate("read")
+                                NoteType.MIND_MAP -> navController.navigate("read")
+                                null -> {}
+                            }
                         },
                         modifier = Modifier.animateItemPlacement()
                     )
@@ -127,14 +151,14 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
             }
         } else {
             // No Notes UI
-            EmptyStateUI(navController)
+            EmptyStateUI(navController,showOptionDialog)
         }
     }
 }
 
 //TODO Note item (Card)
 @Composable
-fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit, modifier: Modifier) {
+fun NoteItem(note: Note,onEdit: ()->Unit, onDelete: () -> Unit, onClick: () -> Unit, modifier: Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f)),
         modifier = modifier
@@ -199,16 +223,31 @@ fun NoteItem(note: Note, onDelete: () -> Unit, onClick: () -> Unit, modifier: Mo
                     overflow = TextOverflow.Ellipsis
                 )
             }
-
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Note",
-                    tint = Color(0xFFFF6B6B)
-                )
+//TODO delete button
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween
+                , modifier = Modifier.fillMaxHeight()
+            ){
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Note",
+                        tint = Color(0xFFFF6B6B)
+                    )
+                }
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Note",
+                        tint = Color(0xFFFF6B6B)
+                    )
+                }
             }
         }
     }
@@ -238,7 +277,7 @@ fun getNoteTypeIcon(type: NoteType?): Int {
 
 // Empty State UI
 @Composable
-fun EmptyStateUI(navController: NavController) {
+fun EmptyStateUI(navController: NavController,showOptionDialog:MutableState<Boolean>) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -263,7 +302,9 @@ fun EmptyStateUI(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Button(
-                onClick = { navController.navigate("add") },
+                onClick = {
+                    showOptionDialog.value=true
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
             ) {
                 Text(text = "Add a Note", color = Color.White)
@@ -283,8 +324,8 @@ fun TopBodyBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp).
-            horizontalScroll(scrollState),
+            .padding(16.dp)
+            .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {

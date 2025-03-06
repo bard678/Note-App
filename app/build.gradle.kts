@@ -6,6 +6,12 @@ plugins {
 }
 
 android {
+    applicationVariants.configureEach {
+        outputs.configureEach {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName="Note.apk"
+        }
+
+    }
     namespace = "com.example.myapplication"
     compileSdk = 35
 
@@ -18,6 +24,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildTypes {
         release {
@@ -44,7 +51,9 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-        implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.navigation:navigation-compose:2.8.8")
     kapt("androidx.room:room-compiler:2.6.1")

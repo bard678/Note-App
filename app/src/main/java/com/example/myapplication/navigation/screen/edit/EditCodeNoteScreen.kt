@@ -105,7 +105,7 @@ fun EditCodeNote(
 
                 modifier = Modifier.padding(start = 10.dp),
 
-                value = currentNote.title,
+                value = title.value,
                 onValueChange = {
                     title.value=it
                 }

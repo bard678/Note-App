@@ -48,9 +48,9 @@ fun AddCodeNoteScreen(
 ) {
     val selectedColor= remember { mutableStateOf( ColorObject(Color(0xFF002F50), "Deep Navy")) }
 
-    var codeList= remember { mutableStateListOf<CodeBlock>() }
-    var title= remember { mutableStateOf("title") }
-    var showSaveDialog= remember { mutableStateOf(false) }
+    val codeList= remember { mutableStateListOf<CodeBlock>() }
+    val title= remember { mutableStateOf("title") }
+    val showSaveDialog= remember { mutableStateOf(false) }
 
     Box(){
         Column(
@@ -98,16 +98,33 @@ fun AddCodeNoteScreen(
                     Icon(Icons.Default.Check, contentDescription = "ADD", tint = Color.White)
                 }
             }
-            TextField(
+            OutlinedTextField(
 
-                modifier = Modifier.padding(start = 0.dp),
-
+                modifier = Modifier.padding(start = 4.dp).fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color.White.copy(alpha = 0.8f)
+                    , unfocusedContainerColor = Color.White.copy(alpha = 0.5f)
+                   , focusedBorderColor = Color.Blue,
+                    unfocusedBorderColor = Color.DarkGray
+                )
+                ,
                 value = title.value,
                 onValueChange = {
                     title.value = it
                 }
             )
+            Card  (
+                shape = RectangleShape,
+                modifier = Modifier.padding(4.dp).fillMaxWidth()
+                , colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.5f)
+                )
 
+            ){
+                ColorDropdownScreen(
+                    selectedColor = selectedColor
+                )
+            }
             if (showSaveDialog.value) {
                 var context = LocalContext.current
                 ConfirmAlertDialog(

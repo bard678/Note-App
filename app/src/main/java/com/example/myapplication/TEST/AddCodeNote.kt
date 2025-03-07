@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -34,8 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.CodeBlock
+import com.example.myapplication.data.models.ColorObject
 import com.example.myapplication.ui.colors.ColorServices
 import com.example.myapplication.ui.components.CodeBlockWidget
+import com.example.myapplication.ui.components.ColorDropdownScreen
 
 
 @Preview
@@ -52,9 +56,11 @@ var codeBloks= remember { mutableStateOf<List<CodeBlock>>(listOf(
 )) }
     var codeList= remember { mutableStateListOf<CodeBlock>() }
     val index= remember { mutableStateOf(0) }
-Column (
+    val selectedColor= remember { mutableStateOf( ColorObject(Color(0xFF002F50), "Deep Navy")) }
+
+    Column (
     modifier = Modifier
-        .background(Color.Blue.copy(alpha = 0.9f))
+        .background(selectedColor.value.color)
         .fillMaxSize()
         .padding(top = 20.dp)
 ){
@@ -95,7 +101,18 @@ Column (
 
         modifier = Modifier.padding(start = 10.dp)
     )
+    Card  (
+        shape = RectangleShape,
+        modifier = Modifier.padding(4.dp)
+        , colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.5f)
+        )
 
+    ){
+        ColorDropdownScreen(
+            selectedColor = selectedColor
+        )
+    }
     Column (){
         LazyColumn {
             itemsIndexed(codeList)
@@ -115,7 +132,6 @@ Column (
                     editable = true,
                     description = description,
                     language = language,
-
                     code = code,
                 )
 

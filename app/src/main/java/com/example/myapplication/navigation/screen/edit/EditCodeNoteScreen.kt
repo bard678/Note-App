@@ -20,9 +20,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -42,6 +46,7 @@ import com.example.myapplication.data.CodeBlock
 import com.example.myapplication.data.models.ColorObject
 import com.example.myapplication.ui.colors.ColorServices
 import com.example.myapplication.ui.components.CodeBlockWidget
+import com.example.myapplication.ui.components.ColorDropdownScreen
 import com.example.myapplication.ui.components.dialogs.ConfirmAlertDialog
 import com.example.myapplication.viewmodel.NoteViewModel
 
@@ -52,10 +57,11 @@ fun EditCodeNote(
     viewModel: NoteViewModel
 )
 {
+    var currentNote=viewModel.selectedNote
+
     val selectedColor= remember { mutableStateOf( ColorObject(Color(0xFF002F50), "Deep Navy")) }
      var title= remember { mutableStateOf("title") }
     var showSaveDialog= remember { mutableStateOf(false) }
-    var currentNote=viewModel.selectedNote
 
     var codeList= remember { mutableStateListOf<CodeBlock>() }
   LaunchedEffect(currentNote) {
@@ -94,7 +100,8 @@ fun EditCodeNote(
                       viewModel.updateCodeNote(
                           note = currentNote?.copy(
                               title = title.value,
-                              codeBlocks = codeList
+                              codeBlocks = codeList,
+                              color = selectedColor.value.color.toArgb()
                           )
                       )
 
@@ -111,17 +118,33 @@ fun EditCodeNote(
               }
           }
           if (currentNote != null) {
-              TextField(
+              OutlinedTextField(
 
-                  modifier = Modifier.padding(start = 10.dp),
-
+                  modifier = Modifier.padding(start = 4.dp).fillMaxWidth(),
+                  colors = OutlinedTextFieldDefaults.colors(
+                      focusedContainerColor = Color.White.copy(alpha = 0.8f)
+                      , unfocusedContainerColor = Color.White.copy(alpha = 0.5f)
+                      , focusedBorderColor = Color.Blue,
+                      unfocusedBorderColor = Color.DarkGray
+                  ),
                   value = title.value,
                   onValueChange = {
                       title.value = it
                   }
               )
           }
+          Card  (
+              shape = RectangleShape,
+              modifier = Modifier.padding(4.dp).fillMaxWidth()
+              , colors = CardDefaults.cardColors(
+                  containerColor = Color.White.copy(alpha = 0.5f)
+              )
 
+          ){
+              ColorDropdownScreen(
+                  selectedColor = selectedColor
+              )
+          }
           if (showSaveDialog.value) {
               var context = LocalContext.current
               ConfirmAlertDialog(
@@ -133,7 +156,9 @@ fun EditCodeNote(
                       viewModel.updateCodeNote(
                           note = currentNote?.copy(
                               title = title.value,
-                              codeBlocks = codeList
+                              codeBlocks = codeList,
+                              color = selectedColor.value.color.toArgb()
+
                           )
                       )
                       navController.popBackStack()
@@ -159,7 +184,7 @@ fun EditCodeNote(
                   { i, codeBlok ->
 
                       var description = remember { mutableStateOf(codeBlok.description) }
-                      var language = remember { mutableStateOf(codeBlok.language) }
+                      var language =remember { mutableStateOf(codeBlok.language) }
                       var code = remember { mutableStateOf(codeBlok.code) }
                       codeList.set(
                           index = i, element = CodeBlock(
@@ -172,7 +197,6 @@ fun EditCodeNote(
                           editable = true,
                           description = description,
                           language = language,
-
                           code = code,
                       )
 
@@ -189,9 +213,9 @@ fun EditCodeNote(
               codeList.add(
 
                   CodeBlock(
-                      description = "TODO()",
-                      code = "TODO()",
-                      language = "TODO()"
+                      description = "Java code",
+                      code = "fun main(){}",
+                      language = "java"
                   )
               )
           },

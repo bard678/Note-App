@@ -55,7 +55,10 @@ fun ColorDropdownScreen(selectedColor: MutableState<ColorObject>) {
             onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
-
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.DarkGray,
+                    focusedLabelColor = Color.DarkGray
+                ),
                 value = selectedColor.value.name,
                 onValueChange = { },
                 label = { Text("Select Option", ) },

@@ -1,8 +1,10 @@
 package com.example.myapplication.ui.components.dialogs
 
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Environment
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,6 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
 
 @Composable
 fun ShareDialog(
@@ -17,21 +25,34 @@ fun ShareDialog(
     shareText: String
 ) {
     val context = LocalContext.current
-
+    val scope= rememberCoroutineScope()
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Share") },
         text = { Text("Select an option to share") },
         confirmButton = {
-            TextButton(onClick = {
-                val intent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, shareText)
+           Row() {
+                TextButton(onClick = {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                    }
+                    context.startActivity(Intent.createChooser(intent, "Share via"))
+                    onDismiss()
+                }) {
+                    Text("Share")
                 }
-                context.startActivity(Intent.createChooser(intent, "Share via"))
-                onDismiss()
-            }) {
-                Text("Share")
+               TextButton(onClick = {
+                   scope.launch(Dispatchers.IO) {
+                       val uri = downloadAndSave(context, "https://wandersky.in/wp-content/uploads/2023/08/pxfuel-scaled.jpg")
+                       uri?.let {
+                           shareImage(context, it)
+                       }
+                   }
+                   onDismiss()
+                }) {
+                    Text("Share a Image")
+                }
             }
         },
         dismissButton = {
@@ -42,6 +63,35 @@ fun ShareDialog(
     )
 }
 
+fun downloadAndSave(context: Context,imageUrl: String):Uri?{
+  return  try {
+      val url = URL(imageUrl)
+      val connection=url.openConnection()
+      connection.connect()
+      val inputStream = connection.getInputStream()
+      val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "shared_image.jpg")
+      val outputStream = FileOutputStream(file)
+      inputStream.copyTo(outputStream)
+      outputStream.close()
+      inputStream.close()
+      println("Downloading....")
+      FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+
+  }catch (e:Exception){
+      e.printStackTrace()
+      println("Faled")
+      null
+  }
+}
+fun shareImage(context: Context, imageUri: Uri) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/*"
+        putExtra(Intent.EXTRA_STREAM, imageUri)
+        println("Sending")
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(intent, "Share image via"))
+}
 @Preview
 @Composable
 fun PreviewShareDialog() {

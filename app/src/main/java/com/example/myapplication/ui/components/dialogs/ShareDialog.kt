@@ -41,6 +41,7 @@ fun ShareDialog(
                     onDismiss()
                 }) {
                     Text("Share")
+
                 }
                TextButton(onClick = {
                    scope.launch(Dispatchers.IO) {

@@ -8,6 +8,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
         gradlePluginPortal()
     }
 }
@@ -21,4 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "My Application"
 include(":app")
- 
+include(":pdfWriter")

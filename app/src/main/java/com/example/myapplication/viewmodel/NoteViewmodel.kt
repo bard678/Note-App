@@ -16,7 +16,6 @@ class NoteViewModel(private  val noteDao: NoteDao):ViewModel() {
 
     //TODO Get Notes By Type
     fun getNotesByType(type:NoteType):Flow<List<Note>>{
-
         return noteDao.getNotesByType(type)
      }
  var selectedNote: Note? = null
@@ -40,6 +39,7 @@ class NoteViewModel(private  val noteDao: NoteDao):ViewModel() {
      println("Note Type is : ${type.name}")
       viewModelScope.launch {
           noteDao.insertNote(
+
               Note(
                   title = title,
                   content = content,

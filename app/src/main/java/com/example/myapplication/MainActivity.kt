@@ -50,11 +50,13 @@ import com.example.myapplication.viewmodel.NoteViewModel
 import com.example.myapplication.viewmodel.ViewModelFactory
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             val database = remember { NoteDatabase.getDatabase(this) }
 
             val viewModelFactory = ViewModelFactory(database)

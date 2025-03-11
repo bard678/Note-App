@@ -22,11 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.ui.components.CodeBlockWidget
+import com.example.myapplication.utils.sharePdf
 import com.example.myapplication.viewmodel.NoteViewModel
 import java.util.Locale
 
@@ -43,6 +45,7 @@ fun ReadCodeScreen(viewModel: NoteViewModel,navController: NavController){
                 .fillMaxSize()
                 .padding(top = 20.dp)
         )  {
+            val context= LocalContext.current
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
@@ -59,7 +62,14 @@ fun ReadCodeScreen(viewModel: NoteViewModel,navController: NavController){
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
                 IconButton(
-                    onClick = { },
+                    onClick = {
+
+                        sharePdf(
+                            context = context,
+                            fileName = "${ selectedNote.title }.pdf",
+                            note = selectedNote
+                        )
+                    },
                     modifier = Modifier
                         .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
                         .size(50.dp)

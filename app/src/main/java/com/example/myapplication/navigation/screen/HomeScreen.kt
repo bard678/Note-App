@@ -1,5 +1,7 @@
 package com.example.myapplication.navigation.screen
 
+import DrawerContent
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,12 +30,17 @@ import com.example.myapplication.ui.components.AppBar
 import com.example.myapplication.ui.components.dialogs.ConfirmAlertDialog
 import com.example.myapplication.ui.components.dialogs.OptionsDialog
 import com.example.myapplication.viewmodel.NoteViewModel
+import kotlinx.coroutines.launch
 
 
 //region home ui
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+
    val notes by viewModel.allNote.collectAsState(initial = emptyList())
     var allNote by remember { mutableStateOf<List<Note>>(emptyList()) }
     var showOptionDialog = remember { mutableStateOf(false) }
@@ -48,112 +55,128 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
         }
     }
 
+   ModalNavigationDrawer (
+       drawerContent = { DrawerContent(onClose = {}) },
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1E3C72),
-                        Color(0xFF2A5298)
+       drawerState =drawerState,
+
+   ) {
+    Scaffold {
+        padding->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1E3C72),
+                            Color(0xFF2A5298)
+                        )
                     )
                 )
-            )
-    ) {
-        //TODO App Bar
-        AppBar( showOptionDialog = showOptionDialog)
+        ) {
 
-        //TODO Top Body Bar
-        TopBodyBar(
-            selectedFilter = selectedFilter,
-            onFilterSelected = {
-                noteType -> println(noteType?.name)
-                selectedFilter = noteType
-
-                println(selectedFilter?.name)
-                println(allNote.size)
-            }
-        )
-   //TODO show option dialog before add note
-        if(showOptionDialog.value){
-            OptionsDialog(
-                onDismiss = {showOptionDialog.value=false},
-                onOptionSelected = {
-                    //TODO Manage navigation for Add screens
-                    noteType ->
-                     //TODO Set the selected note type in viewModel class
-                    viewModel.selectedNoteType=noteType
-                    println("${ viewModel?.selectedNoteType?.name }")
-                    showOptionDialog.value=false
-                    when(viewModel.selectedNoteType){
-                        NoteType.CODE->  navController.navigate("addCode")
-                        NoteType.TASK_MANAGEMENT -> navController.navigate("addTask")
-                        NoteType.MIND_MAP ->  navController.navigate("addMindMap")
-                        null -> {}
-                    }
-
-                },
-
-            )
-        }
-        if(showDeleteDialog.value){
-            ConfirmAlertDialog(
-                onDismiss = {showDeleteDialog.value=false },
-                onConfirm = {
-                   if(deletedNote.value!=null){
-                       viewModel.deleteNote(deletedNote.value)
-                   }
-                    showDeleteDialog.value=false
-                            },
-                msg = "Do you want to delete it.",
-                title = "Confirm delete"
-            )
-        }
-        //TODO Display list of notes
-        if (allNote.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                items(allNote, key = { it.id }) { note ->
-                    NoteItem(
-                        note = note,
-                        onEdit = {
-                            //TODO Go to Edit Screen
-                            viewModel.selectedNote = note
-
-                            when(note.type){
-                                NoteType.CODE -> navController.navigate("editCodeNote")
-                                NoteType.TASK_MANAGEMENT -> navController.navigate("editCodeNote")
-                                NoteType.MIND_MAP -> navController.navigate("editCodeNote")
-                                null -> {}
-                            }
-                        },
-                        onDelete = {
-                            showDeleteDialog.value=true
-                            deletedNote.value=note
-                                   },
-                        onClick = {
-                            //TODO Go to Read Screen
-                            viewModel.selectedNote = note
-                            when(note.type){
-                                NoteType.CODE -> navController.navigate("readCodeNote")
-                                NoteType.TASK_MANAGEMENT -> navController.navigate("read")
-                                NoteType.MIND_MAP -> navController.navigate("read")
-                                null -> {}
-                            }
-                        },
-                        modifier = Modifier.animateItemPlacement()
-                    )
+            //TODO App Bar
+            AppBar( showOptionDialog = showOptionDialog,onDrawerButtonClick={
+                scope.launch {
+                    drawerState.open()
                 }
+            })
+
+            //TODO Top Body Bar
+            TopBodyBar(
+                selectedFilter = selectedFilter,
+                onFilterSelected = {
+                        noteType -> println(noteType?.name)
+                    selectedFilter = noteType
+
+                    println(selectedFilter?.name)
+                    println(allNote.size)
+                }
+            )
+            //TODO show option dialog before add note
+            if(showOptionDialog.value){
+                OptionsDialog(
+                    onDismiss = {showOptionDialog.value=false},
+                    onOptionSelected = {
+                        //TODO Manage navigation for Add screens
+                            noteType ->
+                        //TODO Set the selected note type in viewModel class
+                        viewModel.selectedNoteType=noteType
+                        println("${ viewModel?.selectedNoteType?.name }")
+                        showOptionDialog.value=false
+                        when(viewModel.selectedNoteType){
+                            NoteType.CODE->  navController.navigate("addCode")
+                            NoteType.TASK_MANAGEMENT -> navController.navigate("addTask")
+                            NoteType.MIND_MAP ->  navController.navigate("addMindMap")
+                            null -> {}
+                        }
+
+                    },
+
+                    )
             }
-        } else {
-            // No Notes UI
-            EmptyStateUI(navController,showOptionDialog)
+            if(showDeleteDialog.value){
+                ConfirmAlertDialog(
+                    onDismiss = {showDeleteDialog.value=false },
+                    onConfirm = {
+                        if(deletedNote.value!=null){
+                            viewModel.deleteNote(deletedNote.value)
+                        }
+                        showDeleteDialog.value=false
+                    },
+                    msg = "Do you want to delete it.",
+                    title = "Confirm delete"
+                )
+            }
+            //TODO Display list of notes
+            if (allNote.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    items(allNote, key = { it.id }) { note ->
+                        NoteItem(
+                            note = note,
+                            onEdit = {
+                                //TODO Go to Edit Screen
+                                viewModel.selectedNote = note
+
+                                when(note.type){
+                                    NoteType.CODE -> navController.navigate("editCodeNote")
+                                    NoteType.TASK_MANAGEMENT -> navController.navigate("editCodeNote")
+                                    NoteType.MIND_MAP -> navController.navigate("editCodeNote")
+                                    null -> {}
+                                }
+                            },
+                            onDelete = {
+                                showDeleteDialog.value=true
+                                deletedNote.value=note
+                            },
+                            onClick = {
+                                //TODO Go to Read Screen
+                                viewModel.selectedNote = note
+                                when(note.type){
+                                    NoteType.CODE -> navController.navigate("readCodeNote")
+                                    NoteType.TASK_MANAGEMENT -> navController.navigate("read")
+                                    NoteType.MIND_MAP -> navController.navigate("read")
+                                    null -> {}
+                                }
+                            },
+                            modifier = Modifier.animateItemPlacement()
+                        )
+                    }
+                }
+            } else {
+                // No Notes UI
+                EmptyStateUI(navController,showOptionDialog)
+            }
         }
     }
+   }
+
+
 }
 
 //TODO Note item (Card)

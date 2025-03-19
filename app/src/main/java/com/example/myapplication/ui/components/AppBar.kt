@@ -2,7 +2,9 @@ package com.example.myapplication.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,8 +19,22 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 //TODO AppBar component
-fun AppBar(showOptionDialog:MutableState<Boolean>) {
+fun AppBar(showOptionDialog:MutableState<Boolean>,onDrawerButtonClick:()->Unit) {
     TopAppBar(
+        navigationIcon = {
+            IconButton(
+                onClick = {
+                    onDrawerButtonClick()
+
+                }
+            ) {
+                Icon(
+                    tint = Color.White,
+                    imageVector = Icons.AutoMirrored.Outlined.List,
+                    contentDescription = "Add aa note", modifier = androidx.compose.ui.Modifier.size(30.dp)
+                )
+            }
+        },
         title = {
             Text(
                 text = "Note ++ ",

@@ -16,19 +16,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="AddCodeNoteScreen">
+      <SelectionState runConfigName="LoginNavHost">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ReadCodeScreen">
+      <SelectionState runConfigName="EnterCodeScreen">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TestAddCodeNote">
+      <SelectionState runConfigName="VerificationScreen">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewLanguageOptionsDialog">
+      <SelectionState runConfigName="TestRegisterScreen">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewShareDialog">
+      <SelectionState runConfigName="MyDrawerScreen">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

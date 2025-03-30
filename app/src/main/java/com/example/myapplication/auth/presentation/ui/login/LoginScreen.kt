@@ -55,7 +55,6 @@ fun LoginScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var loginMessage by remember { mutableStateOf("") }
-    val errorUserName by remember { mutableStateOf<String?>(null) }
     var errorPassword =loginViewModel.errorPassword
     var errorEmail =loginViewModel.errorEmail
 
@@ -149,8 +148,8 @@ fun LoginScreen(
                            verticalAlignment = Alignment.CenterVertically,
                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                        ){
-                           Text("example:", fontSize = 14.sp, color = Color.Blue, fontWeight = FontWeight.W500)
-                           Text("ahmed12@gmail.com",fontSize = 14.sp)
+                           Text("email:", fontSize = 15.sp, color = Color.Blue, fontWeight = FontWeight.W500)
+                           Text("example@gmail.com",fontSize = 15.sp)
                        }
                    },
                    leadingIcon = {
@@ -170,25 +169,21 @@ fun LoginScreen(
 
                // Password Input
                OutlinedTextField(
-                   isError = errorPassword!=null,
+                   isError = loginViewModel.errorPassword!=null,
                    value = password,
                    supportingText = {
-                    errorPassword?.let {
-                        Text(it)
-                    }
+                       errorPassword?.let {
+                           Text(it)
+                       }
                    },
                    onValueChange = {
                        password = it
                        loginViewModel.onPassChanged(it)
+
                                    },
                    label = {
-                       Row (
-                           verticalAlignment = Alignment.CenterVertically,
-                           horizontalArrangement = Arrangement.spacedBy(6.dp)
-                       ){
-                           Text("example:", fontSize = 14.sp, color = Color.Blue, fontWeight = FontWeight.W500)
-                           Text("Op21+1",fontSize = 14.sp)
-                       }
+                       Text("Password", fontSize = 15.sp)
+
                    },
                    leadingIcon = {
                        Icon(
@@ -215,12 +210,18 @@ fun LoginScreen(
                // Login Button with Animation
                Button(
                    onClick = {
-                   loginViewModel.login(
-                       email = email,
-                       password = password,
-                       profilePicture = "",
-                       context = context
-                   )
+                   if(errorEmail!=null&&errorPassword!=null){
+                       loginViewModel.login(
+                           email = email,
+                           password = password,
+                           profilePicture = "",
+                           context = context
+                       )
+                   }
+                       else {
+                           loginViewModel.onEmailChanged(email)
+                           loginViewModel.onPassChanged(password)
+                   }
 
                  },
                    modifier = Modifier

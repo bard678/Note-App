@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -28,6 +29,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -58,6 +61,9 @@ fun RegisterScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     val registerMessage by remember { mutableStateOf("") }
     val registerState by registerViewModel2.registerState.observeAsState()
+    var errorPassword =registerViewModel2.errorPassword
+    var errorEmail =registerViewModel2.errorEmail
+    var errorName =registerViewModel2.errorName
 
     // Outer container with a vertical gradient background.
     Box(
@@ -109,7 +115,7 @@ fun RegisterScreen(
                             easing = LinearOutSlowInEasing
                         )
                     ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // App Logo
@@ -131,9 +137,17 @@ fun RegisterScreen(
 
                 // Full Name Input
                 OutlinedTextField(
+                    supportingText = {
+                        registerViewModel2.errorName?.let { Text(it) }
+                    },
+                    isError = errorName!=null,
+
                     value = fullName,
-                    onValueChange = { fullName = it },
-                    label = { Text("Full Name") },
+                    onValueChange = {
+                        fullName = it
+                        registerViewModel2.onNameChanged(it)
+                    },
+                  label = { Text("Full Name",fontSize = 15.sp) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Person,
@@ -153,9 +167,27 @@ fun RegisterScreen(
 
                 // Email Input
                 OutlinedTextField(
+                    supportingText = {
+                        registerViewModel2.errorEmail?.let { Text(it) }
+                    },
+                    isError = errorEmail!=null,
+
                     value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
+                    onValueChange = {
+                        email = it
+                        registerViewModel2.onEmailChanged(it)
+                    },
+                    label = {
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ){
+                            Text("email:", fontSize = 15.sp, color = Color.Blue, fontWeight = FontWeight.W500)
+                            Text("example@gmail.com",fontSize = 15.sp)
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Email,
@@ -176,8 +208,25 @@ fun RegisterScreen(
                 // Password Input
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
+                    isError = errorPassword!=null,
+                    supportingText = {
+                        errorPassword?.let {
+                            Text(it)
+                        }
+                    },
+                    onValueChange = {
+                        password = it
+                        registerViewModel2.onPassChanged(it)
+                    },
+                    label = {
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ){
+                            Text("password:", fontSize = 15.sp, color = Color.Blue, fontWeight = FontWeight.W500)
+                            Text("Op21+1",fontSize = 15.sp)
+                        }
+                    },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -209,9 +258,15 @@ fun RegisterScreen(
 
                 // Confirm Password Input
                 OutlinedTextField(
+                    isError = errorPassword!=null,
+                    supportingText = {
+                        errorPassword?.let {
+                            Text(it)
+                        }
+                    },
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
+                    label = { Text("Confirm Password",fontSize = 15.sp) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -233,14 +288,30 @@ fun RegisterScreen(
                 // Register Button with Animation
                 Button(
                     onClick = {
-                        registerViewModel2.register(
-                            context=context,
-                            userViewModel=userViewModel,
-                            name = fullName,
-                            email = email,
-                            password = password,
-                            profilePicture = ""
-                        )
+                   if(password==confirmPassword){
+                       if(errorPassword!=null&&errorName!=null&&errorEmail!=null)
+                       {
+                           registerViewModel2.register(
+                               context=context,
+                               userViewModel=userViewModel,
+                               name = fullName,
+                               email = email,
+                               password = password,
+                               profilePicture = ""
+                           )
+                       }
+
+                       else{
+                           registerViewModel2.onNameChanged(fullName)
+                           registerViewModel2.onPassChanged(password)
+                           registerViewModel2.onEmailChanged(email)
+
+                       }
+                   }
+                        else{
+                            registerViewModel2.errorPassword="Password fields are not the same"
+                   }
+
 
 
                     },

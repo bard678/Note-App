@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +16,9 @@ import com.example.myapplication.auth.data.RegisterReqModel
 import com.example.myapplication.auth.data.RegisterState
 import com.example.myapplication.auth.data.RetrofitInstance
 import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.utils.validateEmail
+import com.example.myapplication.auth.utils.validateName
+import com.example.myapplication.auth.utils.validatePass
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,8 +29,26 @@ import org.json.JSONObject
 class RegisterViewModel : ViewModel() {
     private val _registerState = MutableLiveData<RegisterState>()
     val registerState: LiveData<RegisterState> = _registerState
+    var errorPassword by mutableStateOf<String?>(null)
+    var errorEmail by mutableStateOf<String?>(null)
+    var errorName by mutableStateOf<String?>(null)
 
     private var isRequestInProgress = false
+    fun onEmailChanged(email:String){
+        viewModelScope.launch {
+            errorEmail= validateEmail(email)
+        }
+    }
+    fun onPassChanged(password:String){
+        viewModelScope.launch {
+            errorPassword= validatePass(password)
+        }
+    }
+     fun onNameChanged(name:String){
+            viewModelScope.launch {
+                errorName= validateName(name)
+            }
+        }
 
     fun sendCodeVerification(code:String,context: Context,userViewModel: UserViewModel){
         val dataServices =SecureDataStoreServices(context = context)

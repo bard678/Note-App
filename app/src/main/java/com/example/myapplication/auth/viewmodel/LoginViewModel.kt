@@ -21,6 +21,7 @@ import com.example.myapplication.auth.utils.validateEmail
 import com.example.myapplication.auth.utils.validatePass
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.Dispatcher
 import org.json.JSONObject
@@ -41,7 +42,10 @@ class LoginViewModel() : ViewModel() {
     }
    fun onPassChanged(password:String){
         viewModelScope.launch {
-            errorPassword= validatePass(password)
+            delay(500)
+            errorPassword = if (password.isEmpty()){
+                "Enter your password"
+            } else null
         }
     }
 

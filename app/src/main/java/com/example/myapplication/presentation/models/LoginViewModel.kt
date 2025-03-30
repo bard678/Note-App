@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.auth.data.LoginState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -14,7 +15,10 @@ class LoginViewModel: ViewModel() {
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            _loginState.value = LoginState.Error("Email and Password cannot be empty")
+            _loginState.value = LoginState.Error(
+            msg = "Email and Password cannot be empty",
+            isVerified = 0
+            )
             return
         }
 
@@ -22,7 +26,7 @@ class LoginViewModel: ViewModel() {
 
         // Simulate API request
         viewModelScope.launch {
-            delay(2000) // Simulate network delay
+          // Simulate network delay
 
             if (email == "test@example.com" && password == "password123") {
                 _loginState.value = LoginState.Success("Login successful!")
@@ -32,9 +36,9 @@ class LoginViewModel: ViewModel() {
         }
     }
 }
-sealed class LoginState{
-    object Loading:LoginState()
-
-    data class Success(val message:String):LoginState()
-    data class Error(val message:String):LoginState()
-}
+//sealed class LoginState{
+//    object Loading:LoginState()
+//
+//    data class Success(val message:String):LoginState()
+//    data class Error(val message:String):LoginState()
+//}

@@ -150,12 +150,12 @@ fun TestRegisterScreen(registerViewModel: AuthViewModel= viewModel(), registerVi
 //
 //                )
                 
-                registerViewModel2.register(
-                    name = fullName,
-                    email = email,
-                    password = password,
-                    profilePicture = ""
-                )
+//                registerViewModel2.register(
+//                    name = fullName,
+//                    email = email,
+//                    password = password,
+//                    profilePicture = ""
+//                )
              },
             modifier = Modifier
                 .fillMaxWidth()

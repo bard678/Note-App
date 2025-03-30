@@ -1,12 +1,17 @@
 package com.example.myapplication.auth.presentation.ui.register
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -30,12 +35,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.auth.data.RegisterState
 import com.example.myapplication.auth.viewmodel.AuthViewModel
 import com.example.myapplication.auth.viewmodel.RegisterViewModel
+import com.example.myapplication.auth.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
+    userViewModel: UserViewModel,
+
     navHome:NavController,
     navController: NavController,
     registerViewModel: AuthViewModel,
@@ -65,7 +74,9 @@ fun RegisterScreen(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White.copy(alpha =0.2f)
             ),
-            modifier = Modifier.padding( 24.dp, ).align(Alignment.TopStart),
+            modifier = Modifier
+                .padding(24.dp,)
+                .align(Alignment.TopStart),
             onClick = {
                 // Perform your login logic here
                 // After a successful login, navigate to the home screen
@@ -82,7 +93,8 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
-                .align(Alignment.Center),
+                .align(Alignment.Center)
+                ,
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f))
@@ -90,8 +102,14 @@ fun RegisterScreen(
             Column(
                 modifier = Modifier
                     .padding(24.dp)
-                    .animateContentSize(animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .verticalScroll(rememberScrollState())
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 500,
+                            easing = LinearOutSlowInEasing
+                        )
+                    ),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // App Logo
@@ -99,7 +117,7 @@ fun RegisterScreen(
                     painter = painterResource(id = R.drawable.app_icon), // Replace with your actual logo
                     contentDescription = "Register Logo",
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(70.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
 
@@ -216,11 +234,15 @@ fun RegisterScreen(
                 Button(
                     onClick = {
                         registerViewModel2.register(
+                            context=context,
+                            userViewModel=userViewModel,
                             name = fullName,
                             email = email,
                             password = password,
                             profilePicture = ""
                         )
+
+
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -229,6 +251,8 @@ fun RegisterScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3949AB))
                 ) {
                     HandleRegisterState(
+                        userViewModel=userViewModel,
+                        navController=navController,
                         context = context,
                         registerState = registerState
                     )

@@ -127,7 +127,7 @@ fun DrawerContent(onClose: () -> Unit) {
             Row(
                 modifier = Modifier
                     .height(70.dp)
-                    .background(Color(0XFFFFFDDD))
+                    .background(Color(0XFFFFFDDF))
                     .fillMaxWidth()
                     ,
                 verticalAlignment = Alignment.CenterVertically

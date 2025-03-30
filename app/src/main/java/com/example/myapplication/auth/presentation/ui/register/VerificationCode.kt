@@ -1,3 +1,4 @@
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,14 +10,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,18 +28,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.presentation.ui.register.HandleVerificationState
+import com.example.myapplication.auth.viewmodel.RegisterViewModel
+import com.example.myapplication.auth.viewmodel.UserViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+
 @Composable
-fun VerificationScreen() {
+fun VerificationScreen(
+    userViewModel: UserViewModel,
+    navLogin:NavController,
+    authViewModel:RegisterViewModel= viewModel()) {
     val digitCount = 6
     // Holds each digit's input as a mutable state list.
     val code = remember { mutableStateListOf("", "", "", "", "", "") }
     // Create a focus requester for each digit field.
     val focusRequesters = List(digitCount) { remember { FocusRequester() } }
     val keyboardController = LocalSoftwareKeyboardController.current
-
+    val registerState by authViewModel.registerState.observeAsState()
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -106,12 +121,35 @@ fun VerificationScreen() {
                 onClick = {
                     // Example log output, update with your desired message.
                     Log.e("msg", code.joinToString(separator = ""))
+
+                    authViewModel.sendCodeVerification(code.joinToString(separator = ""),context,userViewModel)
                 },
                 modifier = Modifier.padding(top = 32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White)
             ) {
-                Text("Verify", color = Color(0xFF3F51B5))
+                HandleVerificationState(
+                    navController = navLogin,
+                    context = context,
+                    registerState = registerState
+                )
+
             }
+            TextButton(
+                onClick = {
+                    authViewModel.resendCodeVerification(email = userViewModel.email.value, context = context)
+                }
+            ) {
+                Text(
+                    text = "Resend verification code .",
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+            }
+            Text(
+                text = "userViewModel.refreshToken.value",
+                fontSize = 18.sp,
+                color = Color.White
+            )
         }
     }
 }

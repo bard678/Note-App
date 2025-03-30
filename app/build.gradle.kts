@@ -52,12 +52,12 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-
+    implementation("androidx.datastore:datastore-preferences:1.1.3")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
-    implementation (platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation ("com.google.firebase:firebase-auth-ktx")
-    implementation ("com.google.firebase:firebase-analytics-ktx")
+//    implementation (platform("com.google.firebase:firebase-bom:32.7.0"))
+//    implementation ("com.google.firebase:firebase-auth-ktx")
+//    implementation ("com.google.firebase:firebase-analytics-ktx")
     implementation("io.coil-kt:coil-compose:2.0.0")
     implementation ("com.itextpdf:itext7-core:7.2.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")

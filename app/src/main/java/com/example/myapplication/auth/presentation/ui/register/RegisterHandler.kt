@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.auth.data.RegisterState
+import com.example.myapplication.auth.presentation.ui.theme.btnFont
 import com.example.myapplication.auth.viewmodel.UserViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -41,7 +42,7 @@ fun HandleRegisterState(
         }}
 
         else -> {
-            Text("Register", fontSize = 18.sp, color = Color.White)
+            Text("Register", fontSize = btnFont, color = Color.White)
         }
     }
 }

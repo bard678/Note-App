@@ -29,12 +29,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.R
-import com.example.myapplication.auth.viewmodel.AuthViewModel
+//import com.example.myapplication.auth.viewmodel.AuthViewModel
 import com.example.myapplication.auth.viewmodel.RegisterViewModel
 
 @Preview
 @Composable
-fun TestRegisterScreen(registerViewModel: AuthViewModel= viewModel(), registerViewModel2: RegisterViewModel= viewModel()) {
+fun TestRegisterScreen( registerViewModel2: RegisterViewModel= viewModel()) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
    val context= LocalContext.current

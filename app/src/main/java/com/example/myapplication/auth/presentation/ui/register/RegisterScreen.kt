@@ -1,33 +1,51 @@
 package com.example.myapplication.auth.presentation.ui.register
 
-import android.util.Log
+//import com.example.myapplication.auth.viewmodel.AuthViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,8 +56,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.myapplication.R
-import com.example.myapplication.auth.data.RegisterState
-import com.example.myapplication.auth.viewmodel.AuthViewModel
+import com.example.myapplication.auth.presentation.ui.theme.FontSServices
+import com.example.myapplication.auth.presentation.ui.theme.titleFont
 import com.example.myapplication.auth.viewmodel.RegisterViewModel
 import com.example.myapplication.auth.viewmodel.UserViewModel
 
@@ -50,9 +68,12 @@ fun RegisterScreen(
 
     navHome:NavController,
     navController: NavController,
-    registerViewModel: AuthViewModel,
+
+   // registerViewModel: AuthViewModel,
     registerViewModel2: RegisterViewModel = viewModel()
 ) {
+    val density= LocalDensity.current
+    val fontServices=FontSServices(density)
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -61,9 +82,9 @@ fun RegisterScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     val registerMessage by remember { mutableStateOf("") }
     val registerState by registerViewModel2.registerState.observeAsState()
-    var errorPassword =registerViewModel2.errorPassword
-    var errorEmail =registerViewModel2.errorEmail
-    var errorName =registerViewModel2.errorName
+    val errorPassword =registerViewModel2.errorPassword
+    val errorEmail =registerViewModel2.errorEmail
+    val errorName =registerViewModel2.errorName
 
     // Outer container with a vertical gradient background.
     Box(
@@ -81,7 +102,8 @@ fun RegisterScreen(
                 containerColor = Color.White.copy(alpha =0.2f)
             ),
             modifier = Modifier
-                .padding(24.dp,)
+                .padding(start = 24.dp, top = 35.dp)
+
                 .align(Alignment.TopStart),
             onClick = {
                 // Perform your login logic here
@@ -97,7 +119,6 @@ fun RegisterScreen(
         // Card container for the form.
         Card(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .align(Alignment.Center)
                 ,
@@ -108,14 +129,13 @@ fun RegisterScreen(
             Column(
                 modifier = Modifier
                     .padding(24.dp)
-                    .verticalScroll(rememberScrollState())
                     .animateContentSize(
                         animationSpec = tween(
                             durationMillis = 500,
                             easing = LinearOutSlowInEasing
                         )
                     ),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // App Logo
@@ -130,8 +150,7 @@ fun RegisterScreen(
                 // Title
                 Text(
                     text = "Create an Account",
-                    fontSize = 24.sp,
-                    style = MaterialTheme.typography.headlineMedium,
+                    fontSize = titleFont,
                     color = Color(0xFF3949AB)
                 )
 
@@ -141,13 +160,13 @@ fun RegisterScreen(
                         registerViewModel2.errorName?.let { Text(it) }
                     },
                     isError = errorName!=null,
-
+                    maxLines = 1,
                     value = fullName,
                     onValueChange = {
                         fullName = it
                         registerViewModel2.onNameChanged(it)
                     },
-                  label = { Text("Full Name",fontSize = 15.sp) },
+                  label = { Text("Full Name",fontSize =fontServices. txtFldFont) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Person,
@@ -167,6 +186,7 @@ fun RegisterScreen(
 
                 // Email Input
                 OutlinedTextField(
+                    maxLines = 1,
                     supportingText = {
                         registerViewModel2.errorEmail?.let { Text(it) }
                     },
@@ -182,8 +202,8 @@ fun RegisterScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ){
-                            Text("email:", fontSize = 15.sp, color = Color.Blue, fontWeight = FontWeight.W500)
-                            Text("example@gmail.com",fontSize = 15.sp)
+                            Text("email:",fontSize =fontServices. txtFldFont, color = Color.Blue, fontWeight = FontWeight.W500)
+                            Text("example@gmail.com",fontSize =fontServices. txtFldFont)
                         }
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -207,6 +227,7 @@ fun RegisterScreen(
 
                 // Password Input
                 OutlinedTextField(
+                    maxLines = 2,
                     value = password,
                     isError = errorPassword!=null,
                     supportingText = {
@@ -223,8 +244,8 @@ fun RegisterScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ){
-                            Text("password:", fontSize = 15.sp, color = Color.Blue, fontWeight = FontWeight.W500)
-                            Text("Op21+1",fontSize = 15.sp)
+                            Text("password:", fontSize = fontServices.txtFldFont, color = Color.Blue, fontWeight = FontWeight.W500)
+                            Text("Op21+1",fontSize = fontServices.txtFldFont)
                         }
                     },
                     leadingIcon = {
@@ -258,6 +279,8 @@ fun RegisterScreen(
 
                 // Confirm Password Input
                 OutlinedTextField(
+                    maxLines = 2,
+
                     isError = errorPassword!=null,
                     supportingText = {
                         errorPassword?.let {
@@ -266,7 +289,7 @@ fun RegisterScreen(
                     },
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password",fontSize = 15.sp) },
+                    label = { Text("Confirm Password",fontSize = fontServices.txtFldFont) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -334,7 +357,7 @@ fun RegisterScreen(
                     Text(
                         text = registerMessage,
                         color = Color.Gray,
-                        fontSize = 14.sp
+                        fontSize = fontServices.alreadyFont
                     )
                 }
 
@@ -344,6 +367,7 @@ fun RegisterScreen(
                 }) {
                     Text(
                         "Already have an account? Log in",
+                        fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }

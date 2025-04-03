@@ -52,7 +52,7 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-    implementation("androidx.datastore:datastore-preferences:1.1.3")
+    implementation(libs.androidx.datastore.preferences)
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
 //    implementation (platform("com.google.firebase:firebase-bom:32.7.0"))
@@ -69,10 +69,10 @@ dependencies {
    implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.navigation:navigation-compose:2.8.8")
     implementation(libs.androidx.runtime.livedata)
-    implementation(libs.firebase.auth)
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
+//    implementation(libs.firebase.auth)
+//    implementation(libs.androidx.credentials)
+//    implementation(libs.androidx.credentials.play.services.auth)
+//    implementation(libs.googleid)
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation(libs.androidx.lifecycle.runtime.ktx)

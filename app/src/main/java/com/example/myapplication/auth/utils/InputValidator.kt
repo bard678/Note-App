@@ -17,8 +17,11 @@ suspend fun validateEmail(email: String): String? {
         else ->null
     }
 }
+val passwordRegex = Regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}\$")
+
 suspend fun validatePass(password: String): String? {
      delay(500)
+
     return when {
         password.isEmpty()->"Enter a Password"
         password.length<6 ->"Password is less than 6 characters"

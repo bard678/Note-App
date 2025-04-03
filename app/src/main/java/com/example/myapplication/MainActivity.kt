@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.auth.viewmodel.AuthViewModel
+//import com.example.myapplication.auth.viewmodel.AuthViewModel
 import com.example.myapplication.auth.presentation.ui.LoginNavHost
 import com.example.myapplication.data.NoteDatabase
 import com.example.myapplication.navigation.AppNavHost
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
             }
             val viewModelFactory = ViewModelFactory(database)
             val loginViewModel=LoginViewModel()
-            val authViewModel= AuthViewModel()
+            //val authViewModel= AuthViewModel()
             val registerViewModel=RegisterViewModel()
             val viewModel: NoteViewModel = viewModel(factory = viewModelFactory)
          // viewModel.addNote(title = "Java","Hello",0x002F50)

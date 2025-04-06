@@ -38,15 +38,30 @@ class SecureDataStoreServices(private  val context: Context) {
      suspend fun getAccessToken():String{
          return context.dataStore.data.first()[ACCESS_TOKEN_KEY]?:""
      }
+    suspend fun getUserID():String{
+         return context.dataStore.data.first()[USER_KEY]?:""
+     }
 
-    suspend fun getLoginInfo(): LoginPrefModel {
-        return LoginPrefModel(
-            token = context.dataStore.data.first()[TOKEN_KEY]?:"",
-            accessToken = context.dataStore.data.first()[ACCESS_TOKEN_KEY]?:"",
-            email = context.dataStore.data.first()[EMAIL_KEY]?:"",
-            id = context.dataStore.data.first()[USER_KEY]?:""
-        )
+    suspend fun getLoginInfo(): LoginPrefModel? {
+        val prefs = context.dataStore.data.first()
+
+        val token = prefs[TOKEN_KEY]
+        val accessToken = prefs[ACCESS_TOKEN_KEY]
+        val email = prefs[EMAIL_KEY]
+        val userId = prefs[USER_KEY]
+
+        return if (!token.isNullOrEmpty() && !accessToken.isNullOrEmpty() && !email.isNullOrEmpty() && !userId.isNullOrEmpty()) {
+            LoginPrefModel(
+                token = token,
+                accessToken = accessToken,
+                email = email,
+                id = userId
+            )
+        } else {
+            null
+        }
     }
+
 }
 
 data class LoginPrefModel(

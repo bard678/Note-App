@@ -3,6 +3,8 @@ package com.example.myapplication.auth.viewmodel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +15,7 @@ import com.example.myapplication.auth.data.MediaPostResponse
 import com.example.myapplication.auth.data.RetrofitInstance
 import com.example.myapplication.auth.data.SecureDataStoreServices
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,6 +25,8 @@ import org.json.JSONObject
 
 
 class UserViewModel:ViewModel(){
+    var secureData= MutableLiveData<LoginPrefModel?>()
+
     val contentLoadMsg= MutableStateFlow("")
     private val _email = MutableStateFlow("")
     val email:StateFlow<String> =_email
@@ -30,11 +35,15 @@ class UserViewModel:ViewModel(){
     private  val _token = MutableStateFlow("")
     val token:StateFlow<String> =_email
 
-   private  val _secureData= MutableStateFlow<LoginPrefModel?>(null)
+    private val _secureData= MutableLiveData<LoginPrefModel?>(null)
 
+     var isLoaded = MutableStateFlow(false)
+         private  set
 
 //   private  val _token = MutableStateFlow("")
 //    val token:StateFlow<String> =_email
+
+
 
     fun  setEmail(email:String){
        _email.value=email
@@ -44,11 +53,11 @@ class UserViewModel:ViewModel(){
         _token.value=token
 
     }
-    var secureData= MutableLiveData<LoginPrefModel?>()
     fun getLoginInfoFromStorage(context: Context){
        viewModelScope.launch {
-           val loginInfo = SecureDataStoreServices(context).getLoginInfo()
+           val loginInfo =  SecureDataStoreServices(context).getLoginInfo()
            secureData.value=loginInfo
+           isLoaded.value=true
 
        }
 

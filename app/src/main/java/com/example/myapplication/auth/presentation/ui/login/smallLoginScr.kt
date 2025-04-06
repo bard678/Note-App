@@ -2,6 +2,8 @@ package com.example.myapplication.auth.presentation.ui.login
 
 
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,6 +41,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -67,16 +71,17 @@ import com.example.myapplication.auth.presentation.ui.theme.txtFldFont
 import com.example.myapplication.auth.utils.rememberKeyboardVisibility
 //import com.example.myapplication.auth.viewmodel.AuthViewModel
 import com.example.myapplication.auth.viewmodel.LoginViewModel
+import com.example.myapplication.auth.viewmodel.UserViewModel
 
 
 @Composable
 fun SmallLoginScreen(
     loginViewModel: LoginViewModel = viewModel(),
-
+    userViewModel :UserViewModel,
     navController: NavController,
     navHome: NavController
 ) {
-    val isKeyboardVisible=  rememberKeyboardVisibility()
+    val isKeyboardVisible by  rememberKeyboardVisibility()
 
     val context = LocalContext.current
     val loginState by loginViewModel.loginState.observeAsState()
@@ -87,41 +92,40 @@ fun SmallLoginScreen(
     var errorPassword =loginViewModel.errorPassword
     var errorEmail =loginViewModel.errorEmail
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
+    Column (
+        modifier = Modifier   .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .imePadding()
+
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(Color(0xFF3949AB), Color(0xFF283593))
                 )
             )
     ){
+        Button(
+
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White.copy(alpha = 0.2f)
+            ),
+            modifier = Modifier
+                .padding(start = 24.dp, top = 24.dp, bottom = 30.dp),
+            onClick = {
+                // Perform your login logic here
+                // After a successful login, navigate to the home screen
+                navHome.navigate("home") {
+                    popUpTo("auth") { inclusive = true }
+                }
+            }
+        ) {
+            Text("Skip")
+
+        }
         Box(
-            modifier = Modifier.height(600.dp)
+
 
         ) {
-            Button(
 
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White.copy(alpha = 0.2f)
-                ),
-                modifier = Modifier
-                    .padding(start = 24.dp, top = 24.dp)
-
-
-                    .align(Alignment.TopStart),
-                onClick = {
-                    // Perform your login logic here
-                    // After a successful login, navigate to the home screen
-                    navHome.navigate("home") {
-                        popUpTo("auth") { inclusive = true }
-                    }
-                }
-            ) {
-                Text("Skip")
-
-            }
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,7 +139,7 @@ fun SmallLoginScreen(
                 Column(
                     modifier = Modifier
                         .padding(24.dp)
-                        .verticalScroll(rememberScrollState())
+
                         .animateContentSize(
                             animationSpec = tween(
                                 durationMillis = 500,
@@ -293,7 +297,9 @@ fun SmallLoginScreen(
                                     email = email,
                                     password = password,
                                     profilePicture = "",
-                                    context = context
+                                    context = context,
+                                    userViewModel = userViewModel
+
                                 )
                             } else {
                                 loginViewModel.onEmailChanged(email)
@@ -338,7 +344,16 @@ fun SmallLoginScreen(
             }
 
         }
-        Spacer(Modifier.height(if(isKeyboardVisible)120.dp else 0.dp))
+//        if(isKeyboardVisible){
+//            Spacer(Modifier.height( 200.dp ))
+//
+//
+//
+//        }
+//        LaunchedEffect(isKeyboardVisible) {
+//            Log.e("error","Keyboard is visible: $isKeyboardVisible")
+//            Toast.makeText(context,"Fill the field .",Toast.LENGTH_LONG).show()
+//        }
 
     }
 }

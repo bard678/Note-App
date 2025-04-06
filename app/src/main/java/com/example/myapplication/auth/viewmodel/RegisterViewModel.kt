@@ -21,31 +21,34 @@ import com.example.myapplication.auth.utils.validateName
 import com.example.myapplication.auth.utils.validatePass
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
 import org.json.JSONObject
 
 class RegisterViewModel : ViewModel() {
+
+
     private val _registerState = MutableLiveData<RegisterState>()
     val registerState: LiveData<RegisterState> = _registerState
-    var errorPassword by mutableStateOf<String?>(null)
+    var errorPassword = MutableLiveData<String?>(null)
     var errorEmail by mutableStateOf<String?>(null)
     var errorName by mutableStateOf<String?>(null)
 
     private var isRequestInProgress = false
     fun onEmailChanged(email:String){
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.Main){
             errorEmail= validateEmail(email)
         }
     }
     fun onPassChanged(password:String){
-        viewModelScope.launch {
-            errorPassword= validatePass(password)
+        viewModelScope.launch(Dispatchers.Main) {
+            errorPassword.postValue(validatePass(password))
         }
     }
      fun onNameChanged(name:String){
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.Main) {
                 errorName= validateName(name)
             }
         }
@@ -69,12 +72,12 @@ class RegisterViewModel : ViewModel() {
                     withContext(Dispatchers.Main){
                         response.body()?.let {
                             dataServices.updateLoginInfo(
-
                                 token = it.refreshToken,
                                 accessToken = it.accessToken,
                                 email = it.email,
                                 id = it.id
                             )
+
 
                             userViewModel.setToken(
                                 it.accessToken,
@@ -85,6 +88,8 @@ class RegisterViewModel : ViewModel() {
                         Toast.makeText(context, "token ${ userViewModel.token.value }",Toast.LENGTH_LONG).show()
 
                     }
+                    userViewModel.getLoginInfoFromStorage(context)
+
                 }
                 else {
                     val errorMessage =

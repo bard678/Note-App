@@ -32,7 +32,7 @@ fun LoginNavHost(userViewModel: UserViewModel,navHome: NavController){
         composable("login") {
             LoginScreen(
 
-
+                userViewModel = userViewModel,
                 navController = navController,
                 navHome=navHome
             )
@@ -40,7 +40,7 @@ fun LoginNavHost(userViewModel: UserViewModel,navHome: NavController){
         composable("loginsmall") {
             SmallLoginScreen(
 
-
+                userViewModel = userViewModel,
                 navController = navController,
                 navHome=navHome
             )

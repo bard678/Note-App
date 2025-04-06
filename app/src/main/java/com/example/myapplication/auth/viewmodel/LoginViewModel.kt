@@ -17,12 +17,14 @@ import com.example.myapplication.auth.data.LoginReqModel
 import com.example.myapplication.auth.data.LoginState
 import com.example.myapplication.auth.data.RegisterReqModel
 import com.example.myapplication.auth.data.RetrofitInstance
+import com.example.myapplication.auth.data.SecureDataStoreServices
 import com.example.myapplication.auth.utils.validateEmail
 import com.example.myapplication.auth.utils.validatePass
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
 import org.json.JSONObject
 
@@ -92,7 +94,9 @@ class LoginViewModel() : ViewModel() {
     }
 
     @SuppressLint("SuspiciousIndentation")
-    fun login( email: String, password: String, profilePicture: String? = null,context: Context) {
+    fun login( userViewModel: UserViewModel,email: String, password: String, profilePicture: String? = null,context: Context) {
+        val dataServices = SecureDataStoreServices(context = context)
+
         if (isRequestInProgress) {
             Log.d("LoginViewModel", "Request already in progress, ignoring duplicate request.")
             return
@@ -116,6 +120,25 @@ class LoginViewModel() : ViewModel() {
 
                 if (response.isSuccessful) {
                     _loginState.postValue (LoginState.Success(response.body()?.message ?: "Registration successful"))
+                    withContext(Dispatchers.Main){
+                        response.body()?.let {
+                            dataServices.updateLoginInfo(
+                                token = it.refreshToken,
+                                accessToken = it.accessToken,
+                                email = it.email,
+                                id = it.id
+                            )
+                            userViewModel.setToken(
+                                it.accessToken,
+                                context
+                            )
+                            userViewModel.setEmail(email = it.email)
+                        }
+                        Toast.makeText(context, "token ${ userViewModel.token.value }",Toast.LENGTH_LONG).show()
+
+                    }
+                    userViewModel.getLoginInfoFromStorage(context)
+
                     Log.e("Response"," ${ response.body() }")
                 }
                 else {

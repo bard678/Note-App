@@ -7,13 +7,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.sp
 
-val txtFldFont=13.sp
+val txtFldFont=12.sp
 val sTxtFldFont=11.sp
 val titleFont=21.sp
 val sTitleFont=18.sp
-val btnFont=17.sp
+val btnFont=14.sp
 
-val alreadyFont=14.sp
+val alreadyFont=13.sp
 
 
 class FontSServices(density: Density) {

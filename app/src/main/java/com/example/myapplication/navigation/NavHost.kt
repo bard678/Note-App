@@ -1,7 +1,13 @@
 package com.example.myapplication.navigation
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,20 +30,25 @@ import com.example.myapplication.presentation.models.LoginViewModel
 import com.example.myapplication.presentation.models.RegisterViewModel
 import com.example.myapplication.presentation.register.RegisterScreen
 import com.example.myapplication.viewmodel.NoteViewModel
+import kotlinx.coroutines.runBlocking
 
 @Composable
 //TODO Navigation  Host
-fun AppNavHost(registerViewModel: RegisterViewModel,viewModel: NoteViewModel,loginViewModel: LoginViewModel) {
+fun AppNavHost(context:Context,userViewModel:UserViewModel,registerViewModel: RegisterViewModel,viewModel: NoteViewModel,loginViewModel: LoginViewModel) {
     val navController = rememberNavController()
-    val userViewModel:UserViewModel= viewModel()
+    val isLoaded by userViewModel.isLoaded.collectAsState()
+
+    userViewModel.getLoginInfoFromStorage(context)
     NavHost(
-        navController = navController, startDestination = "auth") {
+        navController = navController, startDestination = if (userViewModel.secureData.value==null) "auth" else "home") {
        composable("auth"){
 
-           LoginNavHost(
-               userViewModel=userViewModel,
-               navHome  =navController
-           )
+
+               LoginNavHost(
+                   userViewModel = userViewModel,
+                   navHome = navController
+               )
+
        }
         composable("home") { HomeScreen( viewModel = viewModel,navController = navController) }
         composable("add") { NoteAddScreen(viewModel = viewModel, navController = navController) }

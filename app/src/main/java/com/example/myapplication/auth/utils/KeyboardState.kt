@@ -1,31 +1,37 @@
 package com.example.myapplication.auth.utils
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.graphics.Rect
+import android.view.ViewTreeObserver
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 @Composable
-fun rememberKeyboardVisibility(): Boolean {
+fun rememberKeyboardVisibility(): State<Boolean> {
     val view = LocalView.current
     val density = LocalDensity.current
-    var isKeyboardVisible by remember { mutableStateOf(false) }
+    val keyboardVisibleState = remember { mutableStateOf(false) }
 
     DisposableEffect(view) {
-        val listener = ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-            val imeHeight = with(density) { insets.getInsets(WindowInsetsCompat.Type.ime()).bottom.toDp() }
-            isKeyboardVisible = imeHeight > 0.dp
-            insets
+        val rootView = view.rootView
+        val rect = Rect()
+        val threshold = with(density) { 100.dp.toPx().toInt() }
+
+        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+            rootView.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = rootView.height
+            val visibleHeight = rect.height()
+            val heightDiff = screenHeight - visibleHeight
+            keyboardVisibleState.value = heightDiff > threshold
         }
-        onDispose { listener?.let { ViewCompat.setOnApplyWindowInsetsListener(view, null) } }
+
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+
+        onDispose {
+            rootView.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+        }
     }
 
-    return isKeyboardVisible
+    return keyboardVisibleState
 }

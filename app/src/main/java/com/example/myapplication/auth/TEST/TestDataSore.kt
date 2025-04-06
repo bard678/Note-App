@@ -63,7 +63,7 @@ fun TestDataStore(userViewModel: UserViewModel= viewModel()) {
     {
         var show by remember { mutableStateOf(false) }
         val context= LocalContext.current
-
+        val isLoaded = remember { mutableStateOf(false) }
         //It is linked directly to LiveData of secureData
         val data by  userViewModel.secureData.observeAsState()
 

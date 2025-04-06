@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -60,12 +61,13 @@ import com.example.myapplication.auth.presentation.ui.theme.titleFont
 import com.example.myapplication.auth.presentation.ui.theme.txtFldFont
 //import com.example.myapplication.auth.viewmodel.AuthViewModel
 import com.example.myapplication.auth.viewmodel.LoginViewModel
+import com.example.myapplication.auth.viewmodel.UserViewModel
 
 
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = viewModel(),
-
+    userViewModel: UserViewModel,
     navController: NavController,
     navHome: NavController
 ) {
@@ -81,6 +83,7 @@ fun LoginScreen(
     Box(
        modifier = Modifier
            .fillMaxSize()
+           .imePadding()
            .background(
                brush = Brush.verticalGradient(
                    colors = listOf(Color(0xFF3949AB), Color(0xFF283593))
@@ -165,13 +168,8 @@ fun LoginScreen(
                        loginViewModel.onEmailChanged(it)
                                    },
                    label = {
-                       Row (
-                           verticalAlignment = Alignment.CenterVertically,
-                           horizontalArrangement = Arrangement.spacedBy(6.dp)
-                       ){
-                           Text("email:", fontSize = txtFldFont, color = Color.Blue, fontWeight = FontWeight.W500)
-                           Text("example@gmail.com",fontSize = txtFldFont)
-                       }
+                       Text("example@gmail.com",fontSize = txtFldFont)
+
                    },
                    leadingIcon = {
                        Icon(
@@ -231,12 +229,13 @@ fun LoginScreen(
                // Login Button with Animation
                Button(
                    onClick = {
-                   if(errorEmail!=null&&errorPassword!=null){
+                   if(errorEmail==null&&errorPassword==null){
                        loginViewModel.login(
                            email = email,
                            password = password,
                            profilePicture = "",
-                           context = context
+                           context = context,
+                           userViewModel = userViewModel
                        )
                    }
                        else {

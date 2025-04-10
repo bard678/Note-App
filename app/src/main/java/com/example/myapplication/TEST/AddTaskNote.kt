@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,10 +33,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.Note
-import com.example.myapplication.data.NoteType
-import com.example.myapplication.data.TaskItem
-import com.example.myapplication.data.models.ColorObject
+import com.example.myapplication.RoomDb.Note
+import com.example.myapplication.RoomDb.NoteType
+import com.example.myapplication.RoomDb.TaskItem
+import com.example.myapplication.RoomDb.models.ColorObject
 @Preview
 @Composable
 fun TestTaskManagementScreen(

@@ -3,6 +3,7 @@ package com.example.myapplication.auth.presentation.ui
 import VerificationScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -12,6 +13,8 @@ import com.example.myapplication.auth.presentation.ui.login.LoginScreen
 import com.example.myapplication.auth.presentation.ui.login.SmallLoginScreen
 import com.example.myapplication.auth.presentation.ui.register.RegisterScreen
 import com.example.myapplication.auth.presentation.ui.register.SmallRegisterScreen
+import com.example.myapplication.auth.viewmodel.LoginVm
+import com.example.myapplication.auth.viewmodel.LoginVmFact
 //import com.example.myapplication.auth.viewmodel.AuthViewModel
 import com.example.myapplication.auth.viewmodel.UserViewModel
 
@@ -21,9 +24,12 @@ import com.example.myapplication.auth.viewmodel.UserViewModel
 fun LoginNavHost(userViewModel: UserViewModel,navHome: NavController){
     val navController = rememberNavController()
     val config = LocalConfiguration.current
-
+   val context= LocalContext.current
     val screenWidth = config.screenWidthDp
     val height = config.screenHeightDp
+    val   loginVm: LoginVm = viewModel(factory = LoginVmFact(
+        context = context
+    ))
     NavHost(navController = navController, startDestination =when {
         screenWidth <390 -> "addsmall"
         else ->"add"
@@ -34,7 +40,8 @@ fun LoginNavHost(userViewModel: UserViewModel,navHome: NavController){
 
                 userViewModel = userViewModel,
                 navController = navController,
-                navHome=navHome
+                navHome = navHome,
+                loginVm = loginVm
             )
         }
         composable("loginsmall") {
@@ -42,7 +49,8 @@ fun LoginNavHost(userViewModel: UserViewModel,navHome: NavController){
 
                 userViewModel = userViewModel,
                 navController = navController,
-                navHome=navHome
+                navHome=navHome,
+                loginVm = loginVm
             )
         }
         composable("add") {

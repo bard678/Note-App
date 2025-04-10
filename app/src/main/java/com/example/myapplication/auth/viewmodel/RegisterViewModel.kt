@@ -81,14 +81,14 @@ class RegisterViewModel : ViewModel() {
 
                             userViewModel.setToken(
                                 it.accessToken,
-                                context
+
                             )
                             userViewModel.setEmail(email = it.email)
                         }
                         Toast.makeText(context, "token ${ userViewModel.token.value }",Toast.LENGTH_LONG).show()
 
                     }
-                    userViewModel.getLoginInfoFromStorage(context)
+                    userViewModel.getLoginInfoFromStorage()
 
                 }
                 else {

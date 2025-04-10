@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,7 +46,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -60,25 +58,26 @@ import com.example.myapplication.auth.presentation.ui.theme.alreadyFont
 import com.example.myapplication.auth.presentation.ui.theme.titleFont
 import com.example.myapplication.auth.presentation.ui.theme.txtFldFont
 //import com.example.myapplication.auth.viewmodel.AuthViewModel
-import com.example.myapplication.auth.viewmodel.LoginViewModel
+import com.example.myapplication.auth.viewmodel.LoginVm
+import com.example.myapplication.auth.viewmodel.LoginVmFact
 import com.example.myapplication.auth.viewmodel.UserViewModel
 
 
 @Composable
 fun LoginScreen(
-    loginViewModel: LoginViewModel = viewModel(),
+    loginVm: LoginVm,
     userViewModel: UserViewModel,
     navController: NavController,
     navHome: NavController
 ) {
     val context = LocalContext.current
-    val loginState by loginViewModel.loginState.observeAsState()
+    val loginState by loginVm.loginState.observeAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var loginMessage by remember { mutableStateOf("") }
-    var errorPassword =loginViewModel.errorPassword
-    var errorEmail =loginViewModel.errorEmail
+    var errorPassword =loginVm.errorPassword
+    var errorEmail =loginVm.errorEmail
 
     Box(
        modifier = Modifier
@@ -159,13 +158,13 @@ fun LoginScreen(
                // Email Input
                OutlinedTextField(
                     supportingText = {
-                        loginViewModel.errorEmail?.let { Text(it) }
+                        loginVm.errorEmail?.let { Text(it) }
                                      },
                    isError = errorEmail!=null,
                    value = email,
                    onValueChange = {
                        email = it
-                       loginViewModel.onEmailChanged(it)
+                       loginVm.onEmailChanged(it)
                                    },
                    label = {
                        Text("example@gmail.com",fontSize = txtFldFont)
@@ -188,7 +187,7 @@ fun LoginScreen(
 
                // Password Input
                OutlinedTextField(
-                   isError = loginViewModel.errorPassword!=null,
+                   isError = loginVm.errorPassword!=null,
                    value = password,
                    supportingText = {
                        errorPassword?.let {
@@ -197,7 +196,7 @@ fun LoginScreen(
                    },
                    onValueChange = {
                        password = it
-                       loginViewModel.onPassChanged(it)
+                       loginVm.onPassChanged(it)
 
                                    },
                    label = {
@@ -230,7 +229,7 @@ fun LoginScreen(
                Button(
                    onClick = {
                    if(errorEmail==null&&errorPassword==null){
-                       loginViewModel.login(
+                       loginVm.login(
                            email = email,
                            password = password,
                            profilePicture = "",
@@ -239,8 +238,8 @@ fun LoginScreen(
                        )
                    }
                        else {
-                           loginViewModel.onEmailChanged(email)
-                           loginViewModel.onPassChanged(password)
+                           loginVm.onEmailChanged(email)
+                           loginVm.onPassChanged(password)
                    }
 
                  },

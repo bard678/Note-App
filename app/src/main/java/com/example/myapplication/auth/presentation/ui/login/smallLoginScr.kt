@@ -2,8 +2,6 @@ package com.example.myapplication.auth.presentation.ui.login
 
 
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -37,11 +35,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +51,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -67,16 +62,15 @@ import com.example.myapplication.R
 import com.example.myapplication.auth.presentation.ui.register.textFieldHeight
 import com.example.myapplication.auth.presentation.ui.theme.alreadyFont
 import com.example.myapplication.auth.presentation.ui.theme.titleFont
-import com.example.myapplication.auth.presentation.ui.theme.txtFldFont
 import com.example.myapplication.auth.utils.rememberKeyboardVisibility
 //import com.example.myapplication.auth.viewmodel.AuthViewModel
-import com.example.myapplication.auth.viewmodel.LoginViewModel
+import com.example.myapplication.auth.viewmodel.LoginVm
 import com.example.myapplication.auth.viewmodel.UserViewModel
 
 
 @Composable
 fun SmallLoginScreen(
-    loginViewModel: LoginViewModel = viewModel(),
+    loginVm: LoginVm,
     userViewModel :UserViewModel,
     navController: NavController,
     navHome: NavController
@@ -84,13 +78,13 @@ fun SmallLoginScreen(
     val isKeyboardVisible by  rememberKeyboardVisibility()
 
     val context = LocalContext.current
-    val loginState by loginViewModel.loginState.observeAsState()
+    val loginState by loginVm.loginState.observeAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var loginMessage by remember { mutableStateOf("") }
-    var errorPassword =loginViewModel.errorPassword
-    var errorEmail =loginViewModel.errorEmail
+    var errorPassword =loginVm.errorPassword
+    var errorEmail =loginVm.errorEmail
 
     Column (
         modifier = Modifier   .fillMaxSize()
@@ -178,7 +172,7 @@ fun SmallLoginScreen(
                             value = email,
                             onValueChange = {
                                 email = it
-                                loginViewModel.onEmailChanged(it)
+                                loginVm.onEmailChanged(it)
                             },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -231,7 +225,7 @@ fun SmallLoginScreen(
                             value = password,
                             onValueChange = {
                                 password = it
-                                loginViewModel.onPassChanged(it)
+                                loginVm.onPassChanged(it)
                             },
                             singleLine = true,
                             textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
@@ -293,7 +287,7 @@ fun SmallLoginScreen(
                     Button(
                         onClick = {
                             if (errorEmail != null && errorPassword != null) {
-                                loginViewModel.login(
+                                loginVm.login(
                                     email = email,
                                     password = password,
                                     profilePicture = "",
@@ -302,8 +296,8 @@ fun SmallLoginScreen(
 
                                 )
                             } else {
-                                loginViewModel.onEmailChanged(email)
-                                loginViewModel.onPassChanged(password)
+                                loginVm.onEmailChanged(email)
+                                loginVm.onPassChanged(password)
                             }
 
                         },

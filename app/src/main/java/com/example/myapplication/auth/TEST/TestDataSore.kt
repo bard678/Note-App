@@ -73,7 +73,7 @@ fun TestDataStore(userViewModel: UserViewModel= viewModel()) {
             onClick = {
 
                 // Handle button click here
-                userViewModel.getLoginInfoFromStorage(context)
+                userViewModel.getLoginInfoFromStorage()
 
             },
             modifier = Modifier.padding(top = 8.dp)
@@ -87,7 +87,7 @@ fun TestDataStore(userViewModel: UserViewModel= viewModel()) {
 
                 // Handle button click here
                 data?.let {
-                    userViewModel.loadData(context, it.accessToken) }
+                    userViewModel.loadData( it.accessToken) }
                show=true
                },
             modifier = Modifier.padding(top = 8.dp)
@@ -108,7 +108,7 @@ fun TestDataStore(userViewModel: UserViewModel= viewModel()) {
                onConfirm = { show = false },
                onDismiss = { show = false },
                title = "Res",
-               msg = userViewModel.contentLoadMsg.value
+               msg =" userViewModel.contentLoadMsg.value"
            )
        }
 

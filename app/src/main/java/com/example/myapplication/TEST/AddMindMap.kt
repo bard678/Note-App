@@ -24,13 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.myapplication.data.Edge
-import com.example.myapplication.data.MindMapData
-import com.example.myapplication.data.Node
-import com.example.myapplication.data.Note
-import com.example.myapplication.data.NoteType
-import com.example.myapplication.viewmodel.NoteViewModel
+import com.example.myapplication.RoomDb.Edge
+import com.example.myapplication.RoomDb.MindMapData
+import com.example.myapplication.RoomDb.Node
+import com.example.myapplication.RoomDb.Note
+import com.example.myapplication.RoomDb.NoteType
 
 @Preview
 @Composable

@@ -1,8 +1,8 @@
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.myapplication.data.Note
-import com.example.myapplication.data.NoteType
+import com.example.myapplication.RoomDb.Note
+import com.example.myapplication.RoomDb.NoteType
 import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.events.Event

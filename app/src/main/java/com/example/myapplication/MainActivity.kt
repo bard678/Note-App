@@ -1,6 +1,6 @@
 package com.example.myapplication
 
-import android.content.Intent
+import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,44 +23,36 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.auth.data.SecureDataStoreServices
 //import com.example.myapplication.auth.viewmodel.AuthViewModel
-import com.example.myapplication.auth.presentation.ui.LoginNavHost
 import com.example.myapplication.auth.viewmodel.UserViewModel
-import com.example.myapplication.data.NoteDatabase
-import com.example.myapplication.navigation.AppNavHost
-import com.example.myapplication.presentation.models.LoginViewModel
-import com.example.myapplication.presentation.models.RegisterViewModel
-import com.example.myapplication.viewmodel.NoteViewModel
-import com.example.myapplication.viewmodel.ViewModelFactory
+import com.example.myapplication.RoomDb.NoteDatabase
+import com.example.myapplication.presentation.ui.screen.AppNavHost
+import com.example.myapplication.RoomDb.viewmodel.NoteViewModel
+import com.example.myapplication.RoomDb.viewmodel.ViewModelFactory
+import com.example.myapplication.auth.data.userrepo.UserRepository
+import com.example.myapplication.auth.domain.usecase.user.GetLoginInfoUseCase
+import com.example.myapplication.auth.domain.usecase.user.LoadPostsUseCase
+import com.example.myapplication.auth.domain.usecase.user.LogoutUseCase
+import com.example.myapplication.auth.domain.usecase.user.UserUseClass
+import com.example.myapplication.auth.viewmodel.UserViewModelFactory
+import com.example.myapplication.utils.compose.NetworkMonitorToast
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -74,7 +66,7 @@ class MainActivity : ComponentActivity() {
             val database = remember { NoteDatabase.getDatabase(this) }
             val systemUiController = rememberSystemUiController()
             val navigationBarColor =
-                androidx.compose.ui.graphics.Color.Transparent  // Replace with your desired color
+                Color.Transparent  // Replace with your desired color
 
             SideEffect {
                 systemUiController.setNavigationBarColor(
@@ -84,40 +76,56 @@ class MainActivity : ComponentActivity() {
             }
 //            val serviceIntent = Intent(this, ForegroundService::class.java)
 //            startForegroundService(serviceIntent)
+            val context = LocalContext.current
 
-            val viewModelFactory = ViewModelFactory(database)
-            val loginViewModel = LoginViewModel()
-            //val authViewModel= AuthViewModel()
-            val registerViewModel = RegisterViewModel()
+            val application = context.applicationContext as Application
+
+            val userRepo= UserRepository(context)
+            val viewModelFactory = ViewModelFactory(database,application,userRepo)
+
             val viewModel: NoteViewModel = viewModel(factory = viewModelFactory)
-
 
             // viewModel.addNote(title = "Java","Hello",0x002F50)
             //AppNavHost(viewModel)
             // FakeNoteReadScreen()
-            val context = LocalContext.current
-
-
-            val userViewModel: UserViewModel = viewModel()
+            val userUseClass = UserUseClass(
+                getLoginInfoUseCase = GetLoginInfoUseCase(userRepo),
+                loadPostsUseCase = LoadPostsUseCase(userRepo),
+                logoutUseCase = LogoutUseCase(userRepo)
+            )
+            val userViewModelFactory=UserViewModelFactory(
+                context = context
+            )
+            val userViewModel: UserViewModel = viewModel(factory =userViewModelFactory )
             val isLoaded by userViewModel.isLoaded.collectAsState()
             val secure = userViewModel.secureData.observeAsState()
-            userViewModel.getLoginInfoFromStorage(context)
+            userViewModel.getLoginInfoFromStorage()
+
+            //Logout
+            val isLogin by userViewModel.isLoaded.collectAsState()
+       //   userViewModel.logout()
+//
+//            if (!isLogin){
+//                recreate()
+//            }
+
+
 
 
 
             if (isLoaded) {
+                NetworkMonitorToast()
                 AppNavHost(
-                    registerViewModel = registerViewModel,
                     viewModel = viewModel,
-                    loginViewModel = loginViewModel,
                     userViewModel = userViewModel,
-                    context = this
+                    context = context
                 )
 
             }
         else {
                 // Loading UI while waiting for suspend function to finish
               LoadingScreen()
+
             }
 
             //  val googleAuthViewModel: GoogleAuthViewModel = viewModel() // ✅ Provide GoogleAuthViewModel
@@ -165,7 +173,7 @@ fun LoadingScreen() {
             Icon(
                 painter = painterResource(id = R.drawable.event_note),
                 contentDescription = "Loading Logo",
-                tint = androidx.compose.ui.graphics.Color.White.copy(alpha = alpha),
+                tint = Color.White.copy(alpha = alpha),
                 modifier = Modifier
                     .size(80.dp)
                     .graphicsLayer {
@@ -178,7 +186,7 @@ fun LoadingScreen() {
 
             Text(
                 text = "Loading...",
-                color = androidx.compose.ui.graphics.Color.White.copy(alpha = alpha),
+                color = Color.White.copy(alpha = alpha),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -186,7 +194,7 @@ fun LoadingScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             CircularProgressIndicator(
-                color = androidx.compose.ui.graphics.Color.White,
+                color = Color.White,
                 strokeWidth = 4.dp,
                 modifier = Modifier.size(40.dp)
             )

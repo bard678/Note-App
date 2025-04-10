@@ -1,14 +1,50 @@
 package com.example.myapplication.auth.data
 
-import com.example.myapplication.presentation.models.RegisterRequest
-import com.example.myapplication.presentation.models.RegisterResponse
+import com.example.myapplication.RoomDb.CodeBlock
+import com.example.myapplication.RoomDb.MindMapData
+import com.example.myapplication.RoomDb.Note
+import com.example.myapplication.RoomDb.NoteType
+import com.example.myapplication.RoomDb.TaskItem
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
+
+data class SqlNote(
+    val id: Int,
+    val userId: String,
+    val title: String,
+    val content: String,
+    val timestamp: Long,
+    val color: Int,
+    val alarmTime: Long?, // Can be null
+    val type: NoteType?,
+    val tasks: List<TaskItem>?, // null if not a task note
+    val codeBlocks: List<CodeBlock>?, // only for CODE notes
+    val mindMapData: MindMapData? // only for MIND_MAP notes
+)
+
+fun Note.toSqlNote(userId: String):SqlNote{
+    return SqlNote(
+        id = id,
+        userId =userId,
+        title = title,
+        content = content,
+        timestamp = timestamp,
+        color = color,
+        alarmTime = alarmTime,
+        type = type,
+        tasks =tasks,
+        codeBlocks =codeBlocks,
+        mindMapData = mindMapData
+    )
+}
+
+
+
+
 
 
 data class LoginReqModel (
@@ -104,7 +140,12 @@ data class RefreshResponse(
     val email: String,
     val profilePicture: String
 )
+data class NotePushRes(
+    val message:String ,
+    val affectedRows:String
+)
 interface RegisterApiService {
+
     @GET("/user/posts") // Replace with your actual endpoint
     suspend fun getProtectedData(@Header("authorization") authToken: String): Response<List<MediaPost>>
      @POST("refresh") // Replace with your actual endpoint
@@ -122,6 +163,12 @@ interface RegisterApiService {
 
     @GET("auth/verify/{code}")
     suspend fun verifyEmail(@Path("code") code:String):Response<VerificationRes>
+
+    @POST("api/notes")
+    suspend fun pushNotes(@Body request: List<SqlNote>):Response<NotePushRes>
+
+    @GET
+    suspend fun  getNotes(@Body request: Map<String, String>):Response<Note>
     interface AuthApiService {
         @POST("refresh")
         suspend fun refreshAccessToken(@Body refreshToken: String): Response<RefreshResponse>

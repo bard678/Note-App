@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.myapplication.data.NoteType
+import com.example.myapplication.RoomDb.NoteType
 @Preview
 @Composable
 fun OptionsDialog(

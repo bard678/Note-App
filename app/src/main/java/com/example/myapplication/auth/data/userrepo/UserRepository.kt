@@ -5,8 +5,11 @@ import android.util.Log
 import com.example.myapplication.auth.data.LoginPrefModel
 import com.example.myapplication.auth.data.MediaPost
 import com.example.myapplication.auth.data.RetrofitInstance
-import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.data.SecureLoginDataStoreServices
+import com.example.myapplication.settings.data.models.SettingsPrefModel
+import com.example.myapplication.settings.settingmanager.SecureSettingDataManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
@@ -14,17 +17,20 @@ class UserRepository (
     private  val context: Context
 ) {
 
+
     suspend fun getLoginInfo(): LoginPrefModel? {
 
-        return SecureDataStoreServices(context).getLoginInfo()
+        return SecureLoginDataStoreServices(context).getLoginInfo()
     }
 
+
     suspend fun logout(){
-        SecureDataStoreServices(context).updateLoginInfo(
+        SecureLoginDataStoreServices(context).updateLoginInfo(
             token = "",
             email = "",
             id = "",
-            accessToken = ""
+            accessToken = "",
+            name = "",
         )
     }
 

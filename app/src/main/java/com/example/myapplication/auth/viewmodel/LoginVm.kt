@@ -3,8 +3,6 @@ package com.example.myapplication.auth.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,10 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.auth.data.LoginReqModel
 import com.example.myapplication.auth.data.LoginState
 import com.example.myapplication.auth.data.RetrofitInstance
-import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.data.SecureLoginDataStoreServices
 import com.example.myapplication.auth.data.loginrepo.LoginRepo
 import com.example.myapplication.auth.domain.usecase.auth.LoginCase
 import com.example.myapplication.auth.domain.usecase.auth.LoginUseClass
@@ -24,7 +21,6 @@ import com.example.myapplication.auth.utils.validateEmail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class LoginVm(private val loginUseClass: LoginUseClass) : ViewModel() {
@@ -95,7 +91,7 @@ class LoginVm(private val loginUseClass: LoginUseClass) : ViewModel() {
 
     @SuppressLint("SuspiciousIndentation")
     fun login( userViewModel: UserViewModel,email: String, password: String, profilePicture: String? = null,context: Context) {
-        val dataServices = SecureDataStoreServices(context = context)
+        val dataServices = SecureLoginDataStoreServices(context = context)
         var msg=""
         if (isRequestInProgress) {
             Log.d("LoginViewModel", "Request already in progress, ignoring duplicate request.")
@@ -130,7 +126,8 @@ class LoginVm(private val loginUseClass: LoginUseClass) : ViewModel() {
                                 token = it.refreshToken,
                                 accessToken = it.accessToken,
                                 email = it.email,
-                                id = it.id
+                                id = it.id,
+                                name = it.name
                             )
                             userViewModel.setToken(
                                 it.accessToken,

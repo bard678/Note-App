@@ -2,9 +2,9 @@ package com.example.myapplication.RoomDb.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,7 +15,7 @@ import com.example.myapplication.RoomDb.NoteDatabase
 import com.example.myapplication.RoomDb.NoteType
 import com.example.myapplication.auth.data.LoginPrefModel
 import com.example.myapplication.auth.data.RetrofitInstance
-import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.data.SecureLoginDataStoreServices
 import com.example.myapplication.auth.data.SqlNote
 import com.example.myapplication.auth.data.userrepo.UserRepository
 import com.example.myapplication.auth.data.toSqlNote
@@ -28,9 +28,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class NoteViewModel( private  val noteDao: NoteDao,application: Application, private val userRepo: UserRepository):AndroidViewModel(application) {
+class NoteViewModel(private  val noteDao: NoteDao,private val context: Context, private val userRepo: UserRepository):ViewModel() {
     @SuppressLint("StaticFieldLeak")
-    val context = getApplication<Application>().applicationContext!!
+   // val context = getApplication<Application>().applicationContext!!
     val allNote=noteDao.getAllNotes()
     val loginInfoUseCase= GetLoginInfoUseCase(userRepo)
     private val _loginInfo = MutableStateFlow<LoginPrefModel?>(null)
@@ -68,7 +68,7 @@ class NoteViewModel( private  val noteDao: NoteDao,application: Application, pri
 
                }
 
-               val userId = SecureDataStoreServices(context).getUserID()
+               val userId = SecureLoginDataStoreServices(context).getUserID()
                val unSyncedNotes = noteDao.getUnsyncedNotes()
 
                val sqlNotes: List<SqlNote> = unSyncedNotes.map { note ->
@@ -212,8 +212,8 @@ class NoteViewModel( private  val noteDao: NoteDao,application: Application, pri
     }
 }
 
-class ViewModelFactory(private  val database: NoteDatabase, private  val application: Application, private val userRepo: UserRepository,) : ViewModelProvider.Factory {
+class ViewModelFactory(private  val database: NoteDatabase, private  val context: Context, private val userRepo: UserRepository,) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return NoteViewModel(database.noteDao(),application,userRepo) as T
+        return NoteViewModel(database.noteDao(),context,userRepo) as T
     }
 }

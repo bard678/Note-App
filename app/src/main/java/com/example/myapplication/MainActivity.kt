@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -51,6 +52,7 @@ import com.example.myapplication.auth.domain.usecase.user.LoadPostsUseCase
 import com.example.myapplication.auth.domain.usecase.user.LogoutUseCase
 import com.example.myapplication.auth.domain.usecase.user.UserUseClass
 import com.example.myapplication.auth.viewmodel.UserViewModelFactory
+import com.example.myapplication.settings.theme.MyAppTheme
 import com.example.myapplication.utils.compose.NetworkMonitorToast
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -81,7 +83,7 @@ class MainActivity : ComponentActivity() {
             val application = context.applicationContext as Application
 
             val userRepo= UserRepository(context)
-            val viewModelFactory = ViewModelFactory(database,application,userRepo)
+            val viewModelFactory = ViewModelFactory(database,context,userRepo)
 
             val viewModel: NoteViewModel = viewModel(factory = viewModelFactory)
 
@@ -120,6 +122,7 @@ class MainActivity : ComponentActivity() {
                     userViewModel = userViewModel,
                     context = context
                 )
+
 
             }
         else {

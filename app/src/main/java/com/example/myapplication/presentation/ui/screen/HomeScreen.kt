@@ -1,6 +1,8 @@
 package com.example.myapplication.presentation.ui.screen
 
 import DrawerContent
+import android.app.Application
+import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,27 +18,76 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.R
 import com.example.myapplication.RoomDb.Note
+import com.example.myapplication.RoomDb.NoteDatabase
 import com.example.myapplication.RoomDb.NoteType
 import com.example.myapplication.ui.components.AppBar
 import com.example.myapplication.ui.components.dialogs.ConfirmAlertDialog
 import com.example.myapplication.ui.components.dialogs.OptionsDialog
 import com.example.myapplication.RoomDb.viewmodel.NoteViewModel
-import com.example.myapplication.utils.compose.NetworkMonitorToast
+import com.example.myapplication.RoomDb.viewmodel.ViewModelFactory
+import com.example.myapplication.auth.data.userrepo.UserRepository
+import com.example.myapplication.auth.domain.usecase.user.GetLoginInfoUseCase
+import com.example.myapplication.auth.domain.usecase.user.LoadPostsUseCase
+import com.example.myapplication.auth.domain.usecase.user.LogoutUseCase
+import com.example.myapplication.auth.domain.usecase.user.UserUseClass
+import com.example.myapplication.auth.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
+
+
+@Preview(showBackground = true)
+@Composable
+fun HomePreview() {
+    val context = LocalContext.current
+
+    // Mock repository and database
+    val userRepo = UserRepository(context) // Use a simple mock implementation for preview
+    val database = mockDatabase(context) // Use a mock or simplified database for preview
+
+    // NoteViewModel can be initialized with a mock or test repository
+    val noteViewModel:NoteViewModel = viewModel(factory = ViewModelFactory(
+        database = database,
+        context = context,
+        userRepo = userRepo
+    ))
+    // Create a mock or simplified NavController for preview purposes
+    val navController = rememberNavController()
+
+    HomeScreen(
+        viewModel = noteViewModel,
+        navController = navController,
+        userViewModel = UserViewModel(
+            userUseClass = UserUseClass(
+                getLoginInfoUseCase = GetLoginInfoUseCase(userRepo),
+                loadPostsUseCase = LoadPostsUseCase(userRepo),
+                logoutUseCase = LogoutUseCase(userRepo)
+            ),
+            context = context
+        )
+    )
+}
+
+// Simple mock for the database or repository, replace with actual mock logic
+fun mockDatabase(context: Context): NoteDatabase {
+    return NoteDatabase.getDatabase(context) // Or mock your database for preview
+}
 
 //region home ui
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
+fun HomeScreen(viewModel: NoteViewModel, navController: NavController,userViewModel: UserViewModel) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -56,24 +107,26 @@ fun HomeScreen(viewModel: NoteViewModel, navController: NavController) {
     }
 
    ModalNavigationDrawer (
-       drawerContent = { DrawerContent(onClose = {}) },
+       drawerContent = {
+           DrawerContent(
+               onClose = {}
+               ,userViewModel
+               ,navController
+           ) },
 
        drawerState =drawerState,
 
    ) {
-    Scaffold {
+    Scaffold (
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor =  MaterialTheme.colorScheme.onBackground,
+
+    ){
         padding->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF1E3C72),
-                            Color(0xFF2A5298)
-                        )
-                    )
-                )
+                .background(MaterialTheme.colorScheme.background)
         ) {
 
             //TODO App Bar
@@ -316,13 +369,13 @@ fun EmptyStateUI(navController: NavController,showOptionDialog:MutableState<Bool
                 painter = painterResource(id = R.drawable.event_note),
                 contentDescription = "No notes",
                 modifier = Modifier.size(80.dp),
-                tint = Color.LightGray
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "No notes found",
                 fontSize = 18.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Spacer(modifier = Modifier.height(12.dp))
             Button(
@@ -393,13 +446,13 @@ fun FilterButton(label: String, isSelected: Boolean, color: Color, onClick: () -
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) color else color.copy(alpha = 0.5f),
+            containerColor = if (isSelected) color else color.copy(alpha = 0.6f),
             contentColor = Color.White
         ),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.padding(4.dp)
     ) {
-        Text(text = label, fontWeight = FontWeight.Bold)
+        Text(text = label, fontWeight = FontWeight.Bold, color = Color.White)
     }
 }
 

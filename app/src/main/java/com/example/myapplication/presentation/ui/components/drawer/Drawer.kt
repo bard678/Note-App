@@ -37,6 +37,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,27 +51,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.auth.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
-@Composable
-fun DrawerScreen( drawerState: MutableState<DrawerState>) {
-    val drawerState = rememberDrawerState(DrawerValue.Open)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent { scope.launch { drawerState.close() } }
-        }
-    ) {
-     //   MainContent { scope.launch { drawerState.open() } }
-    }
-}
 
 
 @Composable
-fun DrawerContent(onClose: () -> Unit) {
+fun DrawerContent(onClose: () -> Unit,userViewModel: UserViewModel,navController: NavController) {
+    val userData by userViewModel.secureData.observeAsState()
+    val email = userData?.email?:"your not login yet ."
+    val isLogin by userViewModel.isLogin.collectAsState()
+    val name = userData?.name?:"your not login yet ."
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -99,7 +94,7 @@ fun DrawerContent(onClose: () -> Unit) {
                         .height(50.dp)
                 ){
                     Column {
-                        Text("Home", fontSize = 17.sp, modifier = Modifier
+                        Text("Home", fontSize = 15.sp, modifier = Modifier
                             .padding(start = 10.dp, top = 2.dp, bottom = 2.dp)
                             .clickable { onClose() })
                         Text("content here", fontSize = 13.sp,
@@ -122,7 +117,9 @@ fun DrawerContent(onClose: () -> Unit) {
             contentPadding = PaddingValues(0.dp),
              modifier = Modifier.padding(bottom = 40.dp),
             shape = RectangleShape,
-            onClick = {}
+            onClick = {
+             navController.navigate(route = "settings")
+            }
         ){
             Row(
                 modifier = Modifier
@@ -147,7 +144,7 @@ fun DrawerContent(onClose: () -> Unit) {
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text("John Doe", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
             }
         }

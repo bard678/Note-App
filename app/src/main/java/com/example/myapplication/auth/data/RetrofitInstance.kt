@@ -13,7 +13,7 @@ class RetrofitInstance (context: Context){
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY // Logs request & response body
         })
-        .authenticator(TokenAuthenticator(SecureDataStoreServices(context)))
+        .authenticator(TokenAuthenticator(SecureLoginDataStoreServices(context)))
         .build()
 
     val api: RegisterApiService by lazy {

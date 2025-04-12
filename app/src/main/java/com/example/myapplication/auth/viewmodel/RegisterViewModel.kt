@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,16 +14,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.auth.data.RegisterReqModel
 import com.example.myapplication.auth.data.RegisterState
 import com.example.myapplication.auth.data.RetrofitInstance
-import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.data.SecureLoginDataStoreServices
 import com.example.myapplication.auth.utils.validateEmail
 import com.example.myapplication.auth.utils.validateName
 import com.example.myapplication.auth.utils.validatePass
-import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 import org.json.JSONObject
 
 class RegisterViewModel : ViewModel() {
@@ -54,7 +50,7 @@ class RegisterViewModel : ViewModel() {
         }
 
     fun sendCodeVerification(code:String,context: Context,userViewModel: UserViewModel){
-        val dataServices =SecureDataStoreServices(context = context)
+        val dataServices = SecureLoginDataStoreServices(context = context)
 
         if (isRequestInProgress) {
             Log.d("RegisterViewModel", "Request already in progress, ignoring duplicate request.")
@@ -75,7 +71,9 @@ class RegisterViewModel : ViewModel() {
                                 token = it.refreshToken,
                                 accessToken = it.accessToken,
                                 email = it.email,
-                                id = it.id
+                                id = it.id,
+                                name = it.name
+
                             )
 
 

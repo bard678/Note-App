@@ -4,13 +4,13 @@ import android.content.Context
 import com.example.myapplication.auth.data.LoginReqModel
 import com.example.myapplication.auth.data.LoginResModel
 import com.example.myapplication.auth.data.RetrofitInstance
-import com.example.myapplication.auth.data.SecureDataStoreServices
+import com.example.myapplication.auth.data.SecureLoginDataStoreServices
 import com.example.myapplication.auth.data.VerificationRes
 import retrofit2.Response
 
 
 class LoginRepo(private val context: Context){
-    val dataServices = SecureDataStoreServices(context = context)
+    val dataServices = SecureLoginDataStoreServices(context = context)
 
     suspend fun login(
         email: String,

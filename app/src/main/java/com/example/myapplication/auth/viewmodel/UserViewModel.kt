@@ -34,7 +34,15 @@ class UserViewModel(
 //    val token:StateFlow<String> =_email
     init {
        getLoginInfoFromStorage()
+       getSettingsInfoFromStorage()
     }
+
+     fun getSettingsInfoFromStorage() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+        }
+    }
+
     private val _token = MutableStateFlow("")
     val token: StateFlow<String> = _token
     fun setToken(token: String) {
